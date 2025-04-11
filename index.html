@@ -1,32 +1,31 @@
 <!DOCTYPE html><html lang="ar" dir="rtl">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DigitEgypt | العمل اللائق والنمو الاقتصادي</title>
+    <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DigitEgypt | نحو مستقبل رقمي يضمن العمل اللائق والنمو المستدام</title>
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2721/2721329.png" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/scrollreveal"></script>
   <script src="https://cdn.lordicon.com/lordicon.js"></script>
+  <script src="https://unpkg.com/scrollreveal"></script>
   <script src="https://unpkg.com/feather-icons"></script>
   <style>
     body {
       font-family: 'Cairo', sans-serif;
-      transition: background 0.4s, color 0.4s;
-    }
-    .dark-mode {
-      background-color: #0b1120;
-      color: #e2e8f0;
-    }
-    .dark-mode .card {
-      background-color: #1f2937;
-      color: #f1f5f9;
+      background-color: #ebe6e1;
+      color: #1e293b;
     }
     .card {
       background-color: #ffffff;
-      border-radius: 20px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
-      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+      padding: 24px;
       transition: all 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
     }
     .toggle-button {
       position: fixed;
@@ -63,105 +62,123 @@
       }
     }
   </style>
-</head>
-<body class="bg-gradient-to-b from-gray-50 to-white dark:bg-[#0b1120] dark:text-white">  <header class="bg-blue-900 text-white shadow-lg sticky top-0 z-50">
+    </head>
+    <body>
+  <header class="bg-blue-900 text-white sticky top-0 z-50" style="background-color: rgb(30, 40, 50);">
     <div class="flex justify-between items-center p-4 max-w-6xl mx-auto">
-      <div class="flex items-center gap-4">
-        <img src="https://cdn-icons-png.flaticon.com/512/2721/2721329.png" alt="logo" class="w-10 h-10 rounded-full">
+      <a href="#top" class="flex items-center gap-4">
         <div>
           <h1 class="text-2xl font-bold">DigitEgypt</h1>
           <p class="text-sm">نحو مستقبل رقمي يضمن العمل اللائق والنمو المستدام</p>
         </div>
-      </div>
+      </a>
       <nav>
         <button class="md:hidden" onclick="toggleMenu()">
-          <i data-feather="menu" class="text-white"></i>
+            <i data-feather="menu" class="text-white"></i>
         </button>
         <ul class="hidden md:flex">
-          <li><a href="#about" class="hover:text-yellow-300">عن المشروع</a></li>
+          <li><a href="#about" class="hover:text-yellow-300">عن المنصة</a></li>
           <li><a href="#vision" class="hover:text-yellow-300">الرؤية</a></li>
           <li><a href="#mission" class="hover:text-yellow-300">الرسالة</a></li>
-          <li><a href="#features" class="hover:text-yellow-300">المحتوى</a></li>
+          <li><a href="#offers" class="hover:text-yellow-300">ماذا يقدم؟</a></li>
           <li><a href="#goals" class="hover:text-yellow-300">الأهداف</a></li>
-          <li><a href="#sdg" class="hover:text-yellow-300">الارتباط الأممي</a></li>
+          <li><a href="#innovation" class="hover:text-yellow-300">الابتكار والجديد</a></li>
+          <li><a href="#sdg" class="hover:text-yellow-300">الارتباط بالمستدامة</a></li>
         </ul>
       </nav>
     </div>
-  </header>  <main class="max-w-6xl mx-auto px-6 space-y-16 py-10">
-    <section class="card text-center">
-      <img src="https://cdn.pixabay.com/photo/2021/03/19/13/09/technology-6108077_960_720.jpg" alt="DigitEgypt Banner" class="rounded-xl w-full h-64 object-cover mb-6">
-      <h2 class="text-2xl font-bold mb-4 text-blue-700 dark:text-blue-300">ما هو مشروع DigitEgypt؟</h2>
-      <p>
-        هو مشروع رقمي مصري مقترح يُعرض كفكرة قابلة للتنفيذ لخدمة الهدف الثامن من أهداف التنمية المستدامة. يربط بين الشباب، التكنولوجيا، والتعليم وسوق العمل.
-        يهدف إلى إنشاء منصة رقمية وطنية تُسهم في خلق فرص عمل لائقة من خلال التدريب، التمكين، والتوجيه.
-      </p>
-    </section><section class="card" id="about">
+  </header> 
+    <section class="text-white py-20  shadow-lg" id="top" style="margin-bottom: 24px; background-color: #306090;">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between px-6">
+      <div class="md:w-1/2 mb-6 md:mb-0">
+        <h1 class="text-4xl font-bold mb-4">ما هو DigitEgypt؟</h1>
+        <p class="text-lg leading-loose">منصة رقمية تمكّن الشباب من مهارات وفرص العمل الرقمي المستدام، وتربطهم بسوق العمل الحديث عبر أدوات تعليمية وخريطة مهنية تفاعلية.</p>
+      </div>
+      <img src="Asset 1.png" class="w-full md:w-1/2 rounded-xl shadow-lg" alt="DigitEgypt">
+    </div>
+    </section>
+  <main class="max-w-6xl mx-auto px-4 md:px-6 space-y-10">
+    <section class="card animate-fadein bg-white" id="about">
+      <div class="flex items-center gap-4">
+        <lord-icon src="https://cdn.lordicon.com/ajkxzzfb.json" trigger="loop" delay="200" style="width:60px;height:60px"></lord-icon>
+        <h2 class="text-2xl font-bold text-blue-700">عن DigitEgypt</h2>
+      </div>
+      <p class="mt-4 leading-loose">DigitEgypt هو منصة رقمية مبتكرة تسعى لتحقيق التكامل بين التعليم الرقمي والعمل عن بُعد وريادة الأعمال التقنية. تهدف إلى تأهيل جيل جديد من الشباب يمتلك الأدوات المعرفية الرقمية اللازمة لخلق فرص عمل تتماشى مع متطلبات سوق العمل الرقمي.</p>
+    </section><section class="card animate-fadein bg-blue-50" id="vision">
   <div class="flex items-center gap-4">
-    <lord-icon src="https://cdn.lordicon.com/twopqjaj.json" trigger="loop" delay="1000" style="width:50px;height:50px"></lord-icon>
-    <h2 class="text-2xl font-bold text-blue-700 dark:text-blue-400">عن DigitEgypt</h2>
+    <lord-icon src="https://cdn.lordicon.com/lzgmgrnn.json" trigger="loop" delay="200" style="width:60px;height:60px"></lord-icon>
+    <h2 class="text-2xl font-bold text-blue-700">الرؤية</h2>
   </div>
-  <p class="mt-4 leading-relaxed">
-    المشروع يهدف إلى بناء مستقبل رقمي فعلي ومتكامل داخل مصر، من خلال تدريب الشباب على المهارات الرقمية، ربطهم بسوق العمل، وتطوير البنية التقنية في المجتمع.
-    يتضمن المنصة محتوى تقني، فرص واقعية، دعم للشركات الناشئة، ومجتمع تفاعلي.
-  </p>
-</section>
-
-<section class="card" id="vision">
-  <h2 class="text-2xl font-bold text-blue-800 dark:text-blue-300">الرؤية</h2>
-  <p class="mt-4">
-    أن تتحول DigitEgypt إلى مركز وطني للتأهيل الرقمي والتوظيف الإلكتروني والتدريب الذاتي، مما يجعل مصر من الدول الرائدة عربيًا في الابتكار الرقمي وتمكين الشباب تقنيًا.
-  </p>
-</section>
-
-<section class="card" id="mission">
-  <h2 class="text-2xl font-bold text-blue-800 dark:text-blue-300">الرسالة</h2>
-  <p class="mt-4">
-    نشر ثقافة العمل الرقمي، بناء مسارات مهنية رقمية للشباب، دمج التكنولوجيا في التعليم والعمل، وتحقيق العدالة في الوصول إلى الفرص.
-  </p>
-</section>
-
-<section class="card" id="features">
-  <h2 class="text-2xl font-bold text-blue-800 dark:text-blue-300">ماذا يقدم الموقع؟</h2>
-  <ul class="list-disc pr-5 mt-4 space-y-2">
-    <li>أكاديمية رقمية تقدم تدريبات عملية</li>
+  <p class="mt-4">أن تصبح DigitEgypt منصة وطنية شاملة تقود التحول الرقمي في مجالات التوظيف والتعليم والتدريب، وتدعم العمل اللائق عبر التكنولوجيا لكل شاب مصري بغض النظر عن مكانه أو خلفيته ، مما يجعل مصر من الدول الرائدة عربيًا في الابتكار الرقمي وتمكين الشباب تقنيًا.</p>
+    </section><section class="card animate-fadein bg-white" id="mission">
+  <div class="flex items-center gap-4">
+    <lord-icon src="https://cdn.lordicon.com/lecprnjb.json" trigger="loop" delay="200" style="width:60px;height:60px"></lord-icon>
+    <h2 class="text-2xl font-bold text-blue-700">الرسالة</h2>
+  </div>
+  <p class="mt-4">تمكين الشباب بالمهارات الرقمية العصرية، وتوفير موارد معرفية وأدوات عمل تساعدهم على الاندماج في الاقتصاد الرقمي وتحقيق الاستقلال المهني من خلال التعلم المستمر والعمل المستقل وريادة الأعمال الرقمية.</p>
+    </section><section class="card animate-fadein bg-gray-100" id="offers">
+  <div class="flex items-center gap-4">
+    <lord-icon src="https://cdn.lordicon.com/qhgmphtg.json" trigger="loop" delay="200" style="width:60px;height:60px"></lord-icon>
+    <h2 class="text-2xl font-bold text-blue-700">ماذا يقدم الموقع؟</h2>
+  </div>
+  <ul class="grid md:grid-cols-2 gap-4 list-disc pr-5">
+    <li>منصة تعليمية تدريبية للمجالات الرقمية</li>
     <li>منصة عمل حر وفرص توظيفية حقيقية</li>
-    <li>دعم الابتكار والمشروعات الريادية</li>
-    <li>مجتمع تفاعلي للنقاش، المبادرة، التطوير</li>
-    <li>شراكات مع كيانات وشركات داعمة</li>
+    <li>نماذج أعمال ومشاريع شبابية حقيقية</li>
+    <li>محرك بحث وفرص عمل رقمية عن بُعد</li>
+    <li>مكتبة أدوات ذكية رقمية</li>
+    <li>خريطة مهارات رقمية لكل مجال وظيفي</li>
   </ul>
-</section>
-
-<section class="card" id="goals">
-  <h2 class="text-2xl font-bold text-blue-800 dark:text-blue-300 mb-4">الأهداف</h2>
-  <ul class="list-disc pr-5 space-y-2">
-    <li>توفير عمل رقمي لائق لجميع الفئات</li>
-    <li>تحقيق إنتاجية فردية مرتفعة</li>
-    <li>خفض البطالة لدى الشباب</li>
-    <li>نشر الوعي التقني والمهني المستقبلي</li>
-    <li>رفع قدرة مصر التنافسية في السوق الرقمي</li>
-  </ul>
-</section>
-
-<section class="card bg-blue-100 dark:bg-slate-800" id="sdg">
-  <h2 class="text-2xl font-bold text-blue-900 dark:text-blue-200">الارتباط بهدف التنمية المستدامة 8</h2>
-  <p class="mt-4">
-    يساهم المشروع بشكل مباشر في تحقيق:
-    <br>
-    - عمل لائق ومنتج
-    <br>
-    - تعليم تقني ملائم لسوق العمل
-    <br>
-    - تمكين المرأة والشباب
-    <br>
-    - دعم السياسات الرقمية الوطنية
-  </p>
-</section>
-
-  </main>  <footer class="text-center text-sm py-6 text-white bg-blue-900 mt-10">
-    جميع الحقوق محفوظة - <a href="https://www.youtube.com/@eng3body0" target="_blank" class="underline">Abdallah Hussein</a> 2025
-  </footer>  <div class="toggle-button" onclick="toggleDarkMode()">
-    <i id="theme-icon" data-feather="moon"></i>
-  </div>  <script>
+    </section><section class="card animate-fadein bg-white" id="goals">
+      <div class="flex items-center gap-4 mb-4">
+        <h2 class="text-2xl font-bold text-blue-700">أهداف المشروع</h2>
+      </div>
+      <ul class="grid md:grid-cols-2 gap-4 list-disc pr-5">
+        <li>تحقيق العدالة في فرص العمل بين الشباب من خلال المهارات لا الواسطة</li>
+        <li>تطوير سوق العمل المصري ليتماشى مع الاقتصاد العالمي الرقمي</li>
+        <li>خفض نسبة البطالة بين الشباب من خلال العمل الرقمي عن بعد</li>
+        <li>توفير فرص دخل مستدام عبر مشاريع صغيرة رقمية</li>
+      </ul>
+    </section><section class="card animate-fadein bg-blue-50" id="innovation">
+  <div class="flex items-center gap-4">
+    <lord-icon src="https://cdn.lordicon.com/diihvcfp.json" trigger="loop" delay="1500" style="width:60px;height:60px"></lord-icon>
+    <h2 class="text-2xl font-bold text-blue-700">الابتكار والجديد</h2>
+  </div>
+  <div class="grid md:grid-cols-2 gap-6 mt-6">
+    <div class="card animate-fadein bg-gray-100">
+      <h3 class="text-lg font-bold text-blue-600 mb-2">فكر جديد للمستقبل</h3>
+      <p>DigitEgypt لا تقدم مجرد تدريب، بل تنشئ بيئة رقمية متكاملة ترتكز على الواقع، وتقدم تجربة تمزج بين التعلم والتوظيف والدعم الفني المباشر لكل شاب.</p>
+    </div>
+    <div class="card animate-fadein bg-gray-100">
+      <h3 class="text-lg font-bold text-blue-600 mb-2">خريطة رقمية وظيفية</h3>
+      <p>لكل مستخدم مسار تعليمي مصمم وفقًا لهدفه الوظيفي، يدعمه الذكاء الاصطناعي والأدوات التفاعلية الحديثة.</p>
+    </div>
+    <div class="card animate-fadein bg-gray-100">
+      <h3 class="text-lg font-bold text-blue-600 mb-2">منصة قابلة للتنفيذ</h3>
+      <p>تم تصميم المنصة لتكون قابلة للتطبيق كسياسة وطنية بدعم الوزارات ومبادرات التحول الرقمي.</p>
+    </div>
+    <div class="card animate-fadein bg-gray-100">
+      <h3 class="text-lg font-bold text-blue-600 mb-2">صوت الشباب الرقمي</h3>
+      <p>المنصة تُعبّر عن طموحات جيل رقمي، يقدم أفكاره، مشاريعه، ويشارك في بناء مستقبل اقتصاد المعرفة.</p>
+    </div>
+  </div>
+    </section><section class="card animate-fadein bg-white" id="sdg">
+    <div class="flex items-center gap-4 mb-4">
+      <h2 class="text-2xl font-bold text-blue-700">الارتباط بهدف التنمية المستدامة الثامن</h2>
+    </div>
+    <h3 class="text-lg font-bold text-blue-600 mb-2">المشروع يخدم بشكل مباشر:</h3>
+    <ul class="grid md:grid-cols-2 gap-4 list-disc pr-5">
+      <li>خلق بيئة رقمية تشجع العمل اللائق</li>
+      <li>تقليل الفجوة الرقمية في التوظيف</li>
+      <li>دعم ريادة الأعمال التقنية</li>
+      <li>رفع إنتاجية الفرد بالدخل الرقمي</li>
+    </ul>
+    </section>
+  </main>
+  <footer class="text-center text-sm py-6 text-white bg-blue-900 mt-16" style="background-color: rgb(30, 40, 50);">
+    جميع الحقوق محفوظة - <a href="https://wa.me/00201030588214" target="_blank" >Abdallah Hussein</a> 2025
+  </footer>
+  <script>
     ScrollReveal().reveal('.card', { origin: 'bottom', distance: '50px', duration: 1000, interval: 200 });
 
     function toggleDarkMode() {
@@ -180,5 +197,14 @@
     }
 
     feather.replace();
-  </script></body>
-  </html>
+
+    ScrollReveal().reveal('section', {
+      origin: 'bottom',
+      distance: '60px',
+      duration: 1000,
+      interval: 200,
+      reset: false
+    });
+  </script>
+    </body>
+</html>
