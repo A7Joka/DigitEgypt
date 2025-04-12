@@ -8,9 +8,11 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/scrollreveal"></script>
   <script src="https://cdn.lordicon.com/lordicon.js"></script>
-  <script src="https://unpkg.com/scrollreveal"></script>
   <script src="https://unpkg.com/feather-icons"></script>
   <style>
+    html {
+      scroll-padding-top: 90px;
+    }
     body {
       font-family: 'Cairo', sans-serif;
       background-color: #ebe6e1;
@@ -61,42 +63,73 @@
         display: flex;
       }
     }
+    .top-section {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #306090;
+      color: white;
+      margin-bottom: 24px;
+    }
+    .top-inner {
+      width: 90%;
+      max-width: 1000px;
+      text-align: center;
+    }
+    @media (min-width: 768px) {
+      .top-inner {
+        width: 70%;
+      }
+    }
+    .navbar {
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .navbar.scrolled {
+      background-color: rgb(30, 40, 50);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
   </style>
     </head>
     <body>
-  <header class="bg-blue-900 text-white sticky top-0 z-50" style="background-color: rgb(30, 40, 50);">
-    <div class="flex justify-between items-center p-4 max-w-6xl mx-auto">
-      <a href="#top" class="flex items-center gap-4">
-        <div>
-          <h1 class="text-2xl font-bold">DigitEgypt</h1>
-          <p class="text-sm">نحو مستقبل رقمي يضمن العمل اللائق والنمو المستدام</p>
+      <header id="navbar" class="navbar text-white fixed w-full top-0 z-50">
+        <div class="flex justify-between items-center p-4 max-w-6xl mx-auto">
+          <a href="#top" class="flex items-center gap-4">
+            <div>
+              <h1 class="text-2xl font-bold">DigitEgypt</h1>
+              <p class="text-sm">نحو مستقبل رقمي يضمن العمل اللائق والنمو المستدام</p>
+            </div>
+          </a>
+          <nav>
+            <button class="md:hidden" onclick="toggleMenu()">
+                <i data-feather="menu" class="text-white"></i>
+            </button>
+            <ul class="hidden md:flex">
+              <li><a href="#about" class="hover:text-yellow-300">عن المنصة</a></li>
+              <li><a href="#vision" class="hover:text-yellow-300">الرؤية</a></li>
+              <li><a href="#mission" class="hover:text-yellow-300">الرسالة</a></li>
+              <li><a href="#offers" class="hover:text-yellow-300">ماذا يقدم؟</a></li>
+              <li><a href="#goals" class="hover:text-yellow-300">الأهداف</a></li>
+              <li><a href="#innovation" class="hover:text-yellow-300">الابتكار والجديد</a></li>
+              <li><a href="#sdg" class="hover:text-yellow-300">الارتباط بالمستدامة</a></li>
+            </ul>
+          </nav>
         </div>
-      </a>
-      <nav>
-        <button class="md:hidden" onclick="toggleMenu()">
-            <i data-feather="menu" class="text-white"></i>
-        </button>
-        <ul class="hidden md:flex">
-          <li><a href="#about" class="hover:text-yellow-300">عن المنصة</a></li>
-          <li><a href="#vision" class="hover:text-yellow-300">الرؤية</a></li>
-          <li><a href="#mission" class="hover:text-yellow-300">الرسالة</a></li>
-          <li><a href="#offers" class="hover:text-yellow-300">ماذا يقدم؟</a></li>
-          <li><a href="#goals" class="hover:text-yellow-300">الأهداف</a></li>
-          <li><a href="#innovation" class="hover:text-yellow-300">الابتكار والجديد</a></li>
-          <li><a href="#sdg" class="hover:text-yellow-300">الارتباط بالمستدامة</a></li>
-        </ul>
-      </nav>
-    </div>
-  </header> 
-    <section class="text-white py-20  shadow-lg" id="top" style="margin-bottom: 24px; background-color: #306090;">
-    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between px-6">
-      <div class="md:w-1/2 mb-6 md:mb-0">
-        <h1 class="text-4xl font-bold mb-4">ما هو DigitEgypt؟</h1>
-        <p class="text-lg leading-loose">منصة رقمية تمكّن الشباب من مهارات وفرص العمل الرقمي المستدام، وتربطهم بسوق العمل الحديث عبر أدوات تعليمية وخريطة مهنية تفاعلية.</p>
-      </div>
-      <img src="Asset 1.png" class="w-full md:w-1/2 rounded-xl shadow-lg" alt="DigitEgypt">
-    </div>
-    </section>
+      </header>  <section id="top" class="top-section py-16 bg-[#306090] text-white">
+        <div class="max-w-6xl mx-auto px-4">
+          <div class="flex flex-col md:flex-row items-center justify-between mx-auto w-full gap-8">
+            <div class="md:w-1/2 text-right">
+              <h1 class="text-4xl font-bold mb-4">ما هو DigitEgypt؟</h1>
+              <p class="text-lg leading-loose">
+                منصة رقمية تمكّن الشباب من مهارات وفرص العمل الرقمي المستدام، وتربطهم بسوق العمل الحديث عبر أدوات تعليمية وخريطة مهنية تفاعلية.
+              </p>
+            </div>
+            <div class="md:w-1/2">
+              <img src="Asset 1.png" alt="DigitEgypt" class="rounded-xl object-cover w-full max-w-md mx-auto">
+            </div>
+          </div>
+        </div>
+      </section>
   <main class="max-w-6xl mx-auto px-4 md:px-6 space-y-10">
     <section class="card animate-fadein bg-white" id="about">
       <div class="flex items-center gap-4">
@@ -176,28 +209,10 @@
     </section>
   </main>
   <footer class="text-center text-sm py-6 text-white bg-blue-900 mt-16" style="background-color: rgb(30, 40, 50);">
-    جميع الحقوق محفوظة - <a href="https://wa.me/00201030588214" target="_blank" >Abdallah Hussein</a> 2025
+    جميع الحقوق محفوظة - <a href="https://wa.me/201030588214" target="_blank" >Abdallah Hussein</a> 2025
   </footer>
   <script>
     ScrollReveal().reveal('.card', { origin: 'bottom', distance: '50px', duration: 1000, interval: 200 });
-
-    function toggleDarkMode() {
-      document.body.classList.toggle('dark-mode');
-      const icon = document.getElementById('theme-icon');
-      if (document.body.classList.contains('dark-mode')) {
-        icon.setAttribute('data-feather', 'sun');
-      } else {
-        icon.setAttribute('data-feather', 'moon');
-      }
-      feather.replace();
-    }
-
-    function toggleMenu() {
-      document.querySelector('nav').classList.toggle('active');
-    }
-
-    feather.replace();
-
     ScrollReveal().reveal('section', {
       origin: 'bottom',
       distance: '60px',
@@ -205,6 +220,28 @@
       interval: 200,
       reset: false
     });
+
+    window.addEventListener('scroll', () => {
+      const nav = document.getElementById('navbar');
+      if (window.scrollY > 50) {
+        nav.classList.add('scrolled');
+      } else {
+        nav.classList.remove('scrolled');
+      }
+    });
+
+    function toggleMenu() {
+  const nav = document.querySelector('nav');
+  nav.classList.toggle('active');
+  const links = nav.querySelectorAll('a');
+  links.forEach(link => {
+    link.addEventListener('click', () => {
+      nav.classList.remove('active');
+    });
+  });
+}
+
+    feather.replace();
   </script>
     </body>
 </html>
