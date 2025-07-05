@@ -7,14 +7,25 @@
     "ABC123XYZ": "2325258222068455523"
   };
 
-  let currentBlogId;
-  try {
-    currentBlogId = window._WidgetManager._GetAllData().blog.blogId;
-  } catch (e) {
-    console.error("❌ Blog ID not found from Blogger context.");
-    debugger;
-    throw new Error("Unauthorized Access 🚫 [No Blog ID]");
+  let currentBlogId = null;
+
+try {
+  if (window._WidgetManager && typeof _WidgetManager._GetAllData === "function") {
+    currentBlogId = _WidgetManager._GetAllData().blog.blogId;
   }
+} catch (e) {}
+
+if (!currentBlogId) {
+  const meta = document.querySelector('meta[name="joka-blog-id"]');
+  currentBlogId = meta?.getAttribute("content") || null;
+}
+
+if (!currentBlogId) {
+  console.error("❌ Blog ID not found (neither auto nor meta).");
+  debugger;
+  throw new Error("Unauthorized Access 🚫 [Missing Blog ID]");
+}
+
 
   if (!apiKey || !allowedKeys[apiKey]) {
     console.error("Unauthorized Access 🚫 [Invalid API Key]");
