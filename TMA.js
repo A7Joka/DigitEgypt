@@ -8,92 +8,80 @@
   };
 
   let currentBlogId = null;
-
-try {
-  if (window._WidgetManager && typeof _WidgetManager._GetAllData === "function") {
-    currentBlogId = _WidgetManager._GetAllData().blog.blogId;
+  try {
+    if (window._WidgetManager && typeof _WidgetManager._GetAllData === "function") {
+      currentBlogId = _WidgetManager._GetAllData().blog.blogId;
+    }
+  } catch (e) {}
+  if (!currentBlogId) {
+    const meta = document.querySelector('meta[name="joka-blog-id"]');
+    currentBlogId = meta?.getAttribute("content") || null;
   }
-} catch (e) {}
-
-if (!currentBlogId) {
-  const meta = document.querySelector('meta[name="joka-blog-id"]');
-  currentBlogId = meta?.getAttribute("content") || null;
-}
-
-if (!currentBlogId) {
-  console.error("❌ Blog ID not found (neither auto nor meta).");
-  debugger;
-  throw new Error("Unauthorized Access 🚫 [Missing Blog ID]");
-}
-
-
+  if (!currentBlogId) {
+    console.error("❌ Blog ID not found (neither auto nor meta).");
+    debugger;
+    throw new Error("Unauthorized Access 🚫 [Missing Blog ID]");
+  }
   if (!apiKey || !allowedKeys[apiKey]) {
     console.error("Unauthorized Access 🚫 [Invalid API Key]");
     debugger;
     throw new Error("Unauthorized Access 🚫");
   }
-
   if (allowedKeys[apiKey] !== currentBlogId) {
     console.error("Unauthorized Access 🚫 [Blog ID Mismatch]");
     debugger;
     throw new Error("Unauthorized Access 🚫");
   }
 
-  if (!containers.length) {
-    console.warn("❌ This script only runs inside <JokaMatch> tag");
-    return;
-  }
-
   const baseURL = "https://script.google.com/macros/s/AKfycby0xGjUv5LAreOP0LMejmekERzMq1QxBrRUbg4tf2QvODOs1GHUYmE_c21Zxdu7Fu6T/exec";
-
   const style = document.createElement("style");
   style.innerHTML = `
-  .inline-match-item {
-    display: flex;
-    align-items: center;
-    min-height: 60px;
-    border-radius: 10px;
-    background: var(--bg);
-    margin-bottom: 5px;
-    justify-content: center;
-    padding: 18px;
-    flex-wrap: wrap;
-  }
-  .inline-match-item .first-team,
-  .inline-match-item .second-team {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    font-size: 12px;
-    color: var(--text);
-  }
-  .inline-match-item .img {
-    width: 26px;
-    height: 26px;
-    margin-right: 10px;
-  }
-  .inline-match-item .img img {
-    max-width: 100%;
-    max-height: 100%;
-  }
-  .inline-match-item .result-wrap {
-    width: 62px;
-    height: 20px;
-    border-radius: 50px;
-    background: var(--result-bg);
-    color: var(--text);
-    font-size: 12px;
-    font-weight: bold;
-    margin: 0 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .match-section-title {
-    font-weight: bold;
-    margin: 10px 0 5px;
-    color: var(--text);
-  }
+    .inline-match-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 60px;
+      border-radius: 10px;
+      background: var(--bg);
+      margin-bottom: 5px;
+      padding: 18px;
+      flex-wrap: wrap;
+    }
+    .inline-match-item .first-team,
+    .inline-match-item .second-team {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      font-size: 12px;
+      color: var(--text);
+    }
+    .inline-match-item .img {
+      width: 26px;
+      height: 26px;
+      margin-right: 10px;
+    }
+    .inline-match-item .img img {
+      max-width: 100%;
+      max-height: 100%;
+    }
+    .inline-match-item .result-wrap {
+      width: 62px;
+      height: 20px;
+      border-radius: 50px;
+      background: var(--result-bg);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: bold;
+      margin: 0 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .match-section-title {
+      font-weight: bold;
+      margin: 10px 0 5px;
+      color: var(--text);
+    }
   `;
   document.head.appendChild(style);
 
@@ -113,15 +101,10 @@ if (!currentBlogId) {
         const matches = json.matches;
 
         const now = new Date();
-        const live = [];
-        const upcoming = [];
-        const ended = [];
+        const live = [], upcoming = [], ended = [];
 
         matches.forEach(match => {
-          const start = new Date(match.start);
-          const status = match.status.trim();
-          const diff = (start - now) / 1000;
-
+          const status = match["Match-Status"];
           if (status.includes("جارية") || status.includes("شوط")) {
             live.push(match);
           } else if (status.includes("انتهت") || status.includes("إنتهت")) {
@@ -133,22 +116,21 @@ if (!currentBlogId) {
 
         const renderSection = (title, list) => {
           if (!list.length) return "";
-          const items = list.map(match => {
-            return `
+          const items = list.map(match => `
             <div class="inline-match-item">
               <div class="first-team">
-                <div class="img"><img src="${match.logoR || ''}" alt=""></div>
-                <b>${match.teams.right}</b>
+                <div class="img"><img src="${match["Team-Right"]["Logo"]}" alt=""></div>
+                <b>${match["Team-Right"]["Name"]}</b>
               </div>
               <div class="result-wrap">
-                <b>${match.score}</b>
+                <b>${match["Team-Right"]["Goal"]} - ${match["Team-Left"]["Goal"]}</b>
               </div>
               <div class="second-team">
-                <b>${match.teams.left}</b>
-                <div class="img"><img src="${match.logoL || ''}" alt=""></div>
+                <b>${match["Team-Left"]["Name"]}</b>
+                <div class="img"><img src="${match["Team-Left"]["Logo"]}" alt=""></div>
               </div>
-            </div>`;
-          }).join("");
+            </div>
+          `).join("");
           return `<div class="match-section-title">${title}</div>${items}`;
         };
 
