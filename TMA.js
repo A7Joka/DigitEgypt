@@ -169,14 +169,39 @@ color: #FF3131;
 }
 /* === Responsiveness === */
 @media (max-width: 500px) {
-  .inline-match-item {
-    flex-direction: column;
-    gap: 6px;
-  }
+.inline-match-item {
+flex-direction: row !important; /* نمنع العمودي */
+flex-wrap: nowrap;
+padding: 12px;
+}
 
-  .inline-match-item .result-wrap {
-    margin: 5px 0;
-  }
+.inline-match-item .first-team,
+.inline-match-item .second-team {
+font-size: 10px;
+gap: 6px;
+}
+
+.inline-match-item .img {
+width: 20px;
+height: 20px;
+}
+
+.inline-match-item .result-wrap {
+margin: 0 10px;
+font-size: 11px;
+width: 50px;
+height: 18px;
+}
+
+.inline-match-item .live {
+font-size: 9px;
+padding: 2px 4px;
+top: -12px;
+}
+
+.match-section-title {
+font-size: 14px;
+}
 }
   `;
   document.head.appendChild(style);
@@ -208,47 +233,45 @@ time: start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
 };
 
-  const buildMatchCard = (match) => {
-    const status = formatStatus(match);
-    const className = status.type === "live" ? "match-live"
-                     : status.type === "upcoming" ? "match-upcoming"
-                     : "match-ended";
+const buildMatchCard = (match) => {
+const status = formatStatus(match);
+const className =
+status.type === "live"
+? "match-live"
+: status.type === "upcoming"
+? "match-upcoming"
+: "match-ended";
 
-    let midContent = "";
+let midContent = "";
 
-    if (status.type === "live") {
-      const percent = Math.max(0, Math.min(100, Math.round((status.minute / 90) * 100)));
-      midContent = `
-        <div class="result-wrap live" style="--percent:${percent}">
-          <b>${match["Team-Right"]["Goal"]} - ${match["Team-Left"]["Goal"]}</b>
-        </div>
-      `;
-    } else if (status.type === "upcoming") {
-      midContent = `<div class="result-wrap"><b>${status.time}</b></div>`;
-    } else if (status.type === "ended") {
+if (status.type === "live") {
+const percent = Math.max(0, Math.min(100, Math.round((status.minute / 90) * 100)));
+midContent = `
+<div class="result-wrap live" style="--percent:${percent}"> <b>${match["Team-Right"]["Goal"]} - ${match["Team-Left"]["Goal"]}</b> </div> `;
+} else if (status.type === "upcoming") {
+midContent = <div class="result-wrap"><b>${status.time}</b></div>;
+} else if (status.type === "ended") {
 const rightGoals = match["Team-Right"]["Goal"];
 const leftGoals = match["Team-Left"]["Goal"];
 const rightClass = rightGoals > leftGoals ? "winner" : rightGoals < leftGoals ? "loser" : "";
 const leftClass = leftGoals > rightGoals ? "winner" : leftGoals < rightGoals ? "loser" : "";
 
-midContent = <div class="result-wrap"> <span class="result-status-text">انتهت المباراة</span> <b class="match-date"> <span class="first-team-result ${rightClass}">${rightGoals}</span> <i>-</i> <span class="second-team-result ${leftClass}">${leftGoals}</span> </b> </div> ;
+midContent = `
+  <div class="result-wrap">
+    <span class="result-status-text">انتهت المباراة</span>
+    <b class="match-date">
+      <span class="first-team-result ${rightClass}">${rightGoals}</span>
+      <i>-</i>
+      <span class="second-team-result ${leftClass}">${leftGoals}</span>
+    </b>
+  </div>
+`;
 }
 
-    return `
-      <div class="inline-match-item ${className}">
-        <div class="first-team">
-          <div class="img"><img src="${match["Team-Right"]["Logo"]}" alt=""></div>
-          <b>${match["Team-Right"]["Name"]}</b>
-        </div>
-        ${midContent}
-        <div class="second-team">
-          <b>${match["Team-Left"]["Name"]}</b>
-          <div class="img"><img src="${match["Team-Left"]["Logo"]}" alt=""></div>
-        </div>
-      </div>
-    `;
-  };
+return `
 
+<div class="inline-match-item ${className}"> <div class="first-team"> <div class="img"><img src="${match["Team-Right"]["Logo"]}" alt=""></div> <b>${match["Team-Right"]["Name"]}</b> </div> ${midContent} <div class="second-team"> <b>${match["Team-Left"]["Name"]}</b> <div class="img"><img src="${match["Team-Left"]["Logo"]}" alt=""></div> </div> </div> `;
+};
   containers.forEach(container => {
     const divs = container.querySelectorAll("div[day]");
     divs.forEach(async div => {
