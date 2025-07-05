@@ -236,6 +236,20 @@ JokaMatch {
 .inline-match-item.active-match .match-team-item.second-team {
   justify-content: flex-start;
 }
+.inline-match-item.match-live .team---item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.inline-match-item.match-live .match-team-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
 
 /* === Cup Title === */
 .cup-title {
@@ -315,6 +329,43 @@ top: -12px;
 font-size: 14px;
 }
 }
+.match-inner-progress-wrap svg {
+  background: var(--progress-bg);
+}
+.match-inner-progress-wrap svg circle {
+  stroke: var(--progress-track);
+}
+.match-inner-progress-wrap svg circle:last-child {
+  stroke: var(--progress-color);
+}
+.match-inner-progress-wrap .number {
+  color: var(--progress-color);
+}
+.inline-match-item.match-live.active-match {
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.inline-match-item.match-live .match-team-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 60px;
+}
+
+.inline-match-item.match-live .team-result {
+  font-size: 14px;
+  font-weight: bold;
+  width: 28px;
+  text-align: center;
+}
+.active-match-progress {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
   `;
   document.head.appendChild(style);
   
@@ -347,38 +398,49 @@ time: start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 
 const buildMatchCard = (match, link = "#") => {
   const status = formatStatus(match);
-  const className =
-    status.type === "live"
-      ? "match-live"
-      : status.type === "upcoming"
-      ? "match-upcoming"
-      : "match-ended";
-
   const rightGoals = match["Team-Right"]["Goal"];
   const leftGoals = match["Team-Left"]["Goal"];
   const rightClass = rightGoals > leftGoals ? "winner" : rightGoals < leftGoals ? "loser" : "";
   const leftClass = leftGoals > rightGoals ? "winner" : leftGoals < rightGoals ? "loser" : "";
+  const matchId = match["ID"] || Math.random().toString(36).substring(2, 9);
 
-  let midContent = "";
+  // ✅ كارت المباريات الجارية فقط بتصميم خاص
+if (status.type === "live") {
+  const minute = status.minute || 0;
+  const matchId = match["ID"] || Math.random().toString(36).substring(2, 9);
+  const startTimestamp = Date.now() - minute * 60 * 1000;
+  const percent = Math.min(100, Math.round((minute / 90) * 100));
 
-  if (status.type === "live") {
-    const minute = status.minute || 0;
-    const matchId = match["ID"] || Math.random().toString(36).substring(2, 9);
-    const startTimestamp = Date.now() - minute * 60 * 1000;
-    const percent = Math.max(0, Math.min(150, Math.round((minute / 90) * 100)));
+  const isRest =
+    status.label.includes("شوط") &&
+    !status.label.includes("الأول") &&
+    !status.label.includes("الثاني") &&
+    !status.label.includes("بدل");
 
-    const isRest =
-      status.label.includes("شوط") &&
-      !status.label.includes("الأول") &&
-      !status.label.includes("الثاني") &&
-      !status.label.includes("بدل");
+  const isFirstHalf = status.label.includes("الأول");
+  const isSecondHalf = status.label.includes("الثاني");
 
-    const extraMinutes = Math.max(0, minute - 90);
-    const extraDisplay = extraMinutes > 0
-      ? `<span id="extra-time-${matchId}" class="extra-time">+<i id="ex-${matchId}" class="extra-count">${extraMinutes}:00</i> / 5</span>`
-      : "";
+  let extraMinutes = 0;
+  if (isFirstHalf && minute > 45) {
+    extraMinutes = minute - 45;
+  } else if (isSecondHalf && minute > 90) {
+    extraMinutes = minute - 90;
+  }
 
-    const progressBlock = `
+  const extraDisplay = extraMinutes > 0
+    ? `<span class="extra-time">+<i class="extra-count">${extraMinutes}:00</i></span>`
+    : "";
+
+  return `
+    <div class="inline-match-item match-live active-match" onclick="window.open('${link}', '_blank')">
+      <div class="match-team-item">
+        <div class="team---item">
+          <div class="img"><img title="${match["Team-Right"]["Name"]}" src="${match["Team-Right"]["Logo"]}"></div>
+          <b>${match["Team-Right"]["Name"]}</b>
+        </div>
+      </div>
+      <div class="first-team-result team-result ${rightClass}">${rightGoals}</div>
+
       <div class="active-match-progress">
         <span class="result-status-text">${isRest ? "استراحة" : "مباشر"}</span>
         <div class="match-inner-progress-wrap" id="progress-wrap-${matchId}" ${isRest ? "" : `data-start="${startTimestamp}"`}>
@@ -393,10 +455,22 @@ const buildMatchCard = (match, link = "#") => {
           ${extraDisplay}
         </div>
       </div>
-    `;
 
-    midContent = progressBlock;
-  } else if (status.type === "upcoming") {
+      <div class="second-team-result team-result ${leftClass}">${leftGoals}</div>
+      <div class="match-team-item">
+        <div class="team---item">
+          <div class="img"><img title="${match["Team-Left"]["Name"]}" src="${match["Team-Left"]["Logo"]}"></div>
+          <b>${match["Team-Left"]["Name"]}</b>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+  // ✅ باقي الكروت (upcoming - ended) بنفس التصميم القديم
+  let midContent = "";
+
+  if (status.type === "upcoming") {
     midContent = `<div class="result-wrap"><b>${status.time}</b></div>`;
   } else if (status.type === "ended") {
     midContent = `
@@ -412,25 +486,20 @@ const buildMatchCard = (match, link = "#") => {
   }
 
   return `
-    <div class="inline-match-item ${className}" onclick="window.open('${link}', '_blank')">
-      <div class="first-team match-team-item">
-        <div class="team---item">
-          <div class="img"><img title="${match["Team-Right"]["Name"]}" src="${match["Team-Right"]["Logo"]}"></div>
-          <b>${match["Team-Right"]["Name"]}</b>
-        </div>
-        <div class="first-team-result team-result ${rightClass}">${rightGoals}</div>
+    <div class="inline-match-item match-${status.type}" onclick="window.open('${link}', '_blank')">
+      <div class="first-team">
+        <div class="img"><img src="${match["Team-Right"]["Logo"]}" alt=""></div>
+        <b>${match["Team-Right"]["Name"]}</b>
       </div>
       ${midContent}
-      <div class="second-team match-team-item">
-        <div class="second-team-result team-result ${leftClass}">${leftGoals}</div>
-        <div class="team---item">
-          <div class="img"><img title="${match["Team-Left"]["Name"]}" src="${match["Team-Left"]["Logo"]}"></div>
-          <b>${match["Team-Left"]["Name"]}</b>
-        </div>
+      <div class="second-team">
+        <b>${match["Team-Left"]["Name"]}</b>
+        <div class="img"><img src="${match["Team-Left"]["Logo"]}" alt=""></div>
       </div>
     </div>
   `;
 };
+
   containers.forEach(container => {
     const divs = container.querySelectorAll("div[day]");
     divs.forEach(async div => {
@@ -439,6 +508,9 @@ const buildMatchCard = (match, link = "#") => {
       const theme = div.getAttribute("theme") || "dark";
 
       div.style.setProperty('--bg', theme === "dark" ? '#151825' : '#f3f3f3');
+div.style.setProperty('--progress-bg', theme === "dark" ? '#191D2D' : '#eee');
+div.style.setProperty('--progress-track', theme === "dark" ? '#333' : '#ccc');
+div.style.setProperty('--progress-color', theme === "dark" ? '#39DBBF' : '#007acc');
       div.style.setProperty('--result-bg', theme === "dark" ? '#191D2D' : '#ddd');
       div.style.setProperty('--text', theme === "dark" ? '#BFC3D4' : '#222');
 const linksAttr = div.getAttribute("link") || "";
