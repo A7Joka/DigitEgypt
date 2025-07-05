@@ -85,14 +85,17 @@
 
   containers.forEach(container => {
     const divs = container.querySelectorAll("div[day]");
-    divs.forEach(async div => {
-      const day = div.getAttribute("day") || "today";
-      const flt = div.getAttribute("flt") || "2";
-      const theme = div.getAttribute("theme") || "dark";
+divs.forEach(async div => {
+  const day = div.getAttribute("day") || "today";
+  const flt = div.getAttribute("flt") || "2";
+  const theme = div.getAttribute("theme") || "dark";
 
-      div.style.setProperty('--bg', theme === "dark" ? '#151825' : '#f3f3f3');
-      div.style.setProperty('--result-bg', theme === "dark" ? '#191D2D' : '#ddd');
-      div.style.setProperty('--text', theme === "dark" ? '#BFC3D4' : '#222');
+  const now = new Date(); // ✅ حل المشكلة هنا
+
+  div.style.setProperty('--bg', theme === "dark" ? '#151825' : '#f3f3f3');
+  div.style.setProperty('--result-bg', theme === "dark" ? '#191D2D' : '#ddd');
+  div.style.setProperty('--text', theme === "dark" ? '#BFC3D4' : '#222');
+
 
       try {
         const res = await fetch(`${baseURL}?date=${day}`);
