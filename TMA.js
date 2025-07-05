@@ -27,72 +27,93 @@
 
   const style = document.createElement("style");
   style.innerHTML = `
-    .inline-match-item {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 60px;
-      border-radius: 10px;
-      margin-bottom: 5px;
-      padding: 18px;
-      flex-wrap: wrap;
-    }
-    .match-live { border-left: 4px solid #FF3131; background: #1c1f2e; }
-    .match-upcoming { border-left: 4px solid #FFB400; background: #232636; }
-    .match-ended { border-left: 4px solid #444; background: #151825; }
+  .inline-match-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60px;
+    border-radius: 10px;
+    margin-bottom: 5px;
+    padding: 18px;
+    flex-wrap: wrap;
+  }
+  .match-live { border-left: 4px solid #FF3131; background: #1c1f2e; }
+  .match-upcoming { border-left: 4px solid #FFB400; background: #232636; }
+  .match-ended { border-left: 4px solid #444; background: #151825; }
 
-    .inline-match-item .first-team,
-    .inline-match-item .second-team {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      font-size: 12px;
-      color: var(--text);
-    }
-    .inline-match-item .img {
-      width: 26px;
-      height: 26px;
-      margin-right: 10px;
-    }
-    .inline-match-item .img img {
-      max-width: 100%;
-      max-height: 100%;
-    }
-    .inline-match-item .result-wrap {
-      width: 62px;
-      height: 20px;
-      border-radius: 50px;
-      background: var(--result-bg);
-      color: var(--text);
-      font-size: 12px;
-      font-weight: bold;
-      margin: 0 15px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .match-section-title {
-      font-weight: bold;
-      margin: 10px 0 5px;
-      color: var(--text);
-      font-size: 16px;
-    }
-    .match-status {
-      width: 100%;
-      text-align: center;
-      font-size: 11px;
-      margin-top: 5px;
-      color: var(--text);
-    }
-    .cup-title {
-      width: 100%;
-      font-size: 13px;
-      font-weight: bold;
-      text-align: center;
-      margin-bottom: 6px;
-      color: var(--text);
-    }
-  `;
+  .inline-match-item .first-team,
+  .inline-match-item .second-team {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    color: var(--text);
+  }
+  .inline-match-item .img {
+    width: 26px;
+    height: 26px;
+    margin-right: 10px;
+  }
+  .inline-match-item .img img {
+    max-width: 100%;
+    max-height: 100%;
+  }
+  .match-section-title {
+    font-weight: bold;
+    margin: 10px 0 5px;
+    color: var(--text);
+    font-size: 16px;
+  }
+  .cup-title {
+    width: 100%;
+    font-size: 13px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+  .live-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .live-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #FF3131;
+    color: #fff;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+  .status-below {
+    font-size: 11px;
+    margin-top: 4px;
+    color: var(--text);
+  }
+  .match-time {
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--text);
+    text-align: center;
+  }
+  .match-result-center {
+    text-align: center;
+  }
+  .ended-label {
+    font-size: 11px;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .result-score {
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--text);
+  }
+`;
   document.head.appendChild(style);
 
   containers.forEach(container => {
@@ -111,26 +132,25 @@
         const json = await res.json();
         const matches = json.matches;
 
-        const formatStatus = (match) => {
-          const now = new Date();
-          const start = new Date(match["Time-Start"]);
-          const timeNow = match["Time-Now"];
-          const status = match["Match-Status"];
-          const diffMin = Math.floor((start - now) / 60000);
+       const formatStatus = (match) => {
+  const now = new Date();
+  const start = new Date(match["Time-Start"]);
+  const timeNow = match["Time-Now"];
+  const status = match["Match-Status"];
+  const diffMin = Math.floor((start - now) / 60000);
 
-          if (status.includes("جارية") || status.includes("شوط")) {
-            const minute = (timeNow > 0 && timeNow <= 130) ? `${timeNow}` : "غير محددة";
-            return { label: `${status} – الدقيقة ${minute}`, type: "live" };
-          } else if (status.includes("انتهت")) {
-            return { label: "إنتهت المباراة", type: "ended" };
-          } else if (diffMin <= 60 && diffMin > 0) {
-            return { label: "بعد قليل", type: "upcoming" };
-          } else if (diffMin > 60) {
-            return { label: `الساعة ${start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`, type: "upcoming" };
-          } else {
-            return { label: status, type: "unknown" };
-          }
-        };
+  if (status.includes("جارية") || status.includes("شوط")) {
+    const minute = (timeNow > 0 && timeNow <= 130) ? `${timeNow}` : "غير محددة";
+    return { label: status, minute: minute, type: "live" };
+  } else if (status.includes("انتهت")) {
+    return { label: "انتهت", type: "ended" };
+  } else {
+    return {
+      label: start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      type: "upcoming"
+    };
+  }
+};
 
         if (flt === "1") {
           const grouped = {};
@@ -193,31 +213,44 @@
         });
 
         const renderSection = (title, list) => {
-          if (!list.length) return "";
-          const items = list.map(match => {
-            const statusData = formatStatus(match);
-            const className = statusData.type === "live" ? "match-live" : statusData.type === "upcoming" ? "match-upcoming" : "match-ended";
-            return `
-              <div class="cup-title">${match["Cup-Name"] || "بطولة غير معروفة"}</div>
-              <div class="inline-match-item ${className}">
-                <div class="first-team">
-                  <div class="img"><img src="${match["Team-Right"]["Logo"]}" alt=""></div>
-                  <b>${match["Team-Right"]["Name"]}</b>
-                </div>
-                <div class="result-wrap">
-                  <b>${match["Team-Right"]["Goal"]} - ${match["Team-Left"]["Goal"]}</b>
-                </div>
-                <div class="second-team">
-                  <b>${match["Team-Left"]["Name"]}</b>
-                  <div class="img"><img src="${match["Team-Left"]["Logo"]}" alt=""></div>
-                </div>
-                <div class="match-status">${statusData.label}</div>
-              </div>
-            `;
-          }).join("");
+  if (!list.length) return "";
+  const items = list.map(match => {
+    const status = formatStatus(match);
+    const className = status.type === "live" ? "match-live" : status.type === "upcoming" ? "match-upcoming" : "match-ended";
+    let midContent = "";
 
-          return `<div class="match-section-title">${title}</div>${items}`;
-        };
+    if (status.type === "live") {
+      midContent = `<div class="live-center">
+        <div class="live-circle">${status.minute}</div>
+        <div class="status-below">${status.label}</div>
+      </div>`;
+    } else if (status.type === "upcoming") {
+      midContent = `<div class="match-time"><b>${status.label}</b></div>`;
+    } else if (status.type === "ended") {
+      midContent = `<div class="match-result-center">
+        <div class="ended-label">انتهت</div>
+        <div class="result-score">${match["Team-Right"]["Goal"]} - ${match["Team-Left"]["Goal"]}</div>
+      </div>`;
+    }
+
+    return `
+      <div class="cup-title">${match["Cup-Name"] || "بطولة غير معروفة"}</div>
+      <div class="inline-match-item ${className}">
+        <div class="first-team">
+          <div class="img"><img src="${match["Team-Right"]["Logo"]}" alt=""></div>
+          <b>${match["Team-Right"]["Name"]}</b>
+        </div>
+        ${midContent}
+        <div class="second-team">
+          <b>${match["Team-Left"]["Name"]}</b>
+          <div class="img"><img src="${match["Team-Left"]["Logo"]}" alt=""></div>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  return `<div class="match-section-title">${title}</div>${items}`;
+};
 
         div.innerHTML = `
           ${renderSection("جارية الآن", live)}
