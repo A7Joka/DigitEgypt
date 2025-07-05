@@ -345,58 +345,60 @@ time: start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
 };
 
-const buildMatchCard = (match) => {
-const status = formatStatus(match);
-const className =
-status.type === "live"
-? "match-live"
-: status.type === "upcoming"
-? "match-upcoming"
-: "match-ended";
+const buildMatchCard = (match, link = "#") => {
+  const status = formatStatus(match);
+  const className =
+    status.type === "live"
+      ? "match-live"
+      : status.type === "upcoming"
+      ? "match-upcoming"
+      : "match-ended";
 
-let midContent = "";
+  let midContent = "";
 
-if (status.type === "live") {
-  const percent = Math.max(0, Math.min(100, Math.round((status.minute / 90) * 100)));
-const matchId = match["ID"] || Math.random().toString(36).substring(2, 9); // ID مميز للمباراة
-const startTimestamp = Date.now() - (status.minute * 60 * 1000); // نحسب متى بدأ الشوط
+  if (status.type === "live") {
+    const percent = Math.max(0, Math.min(100, Math.round((status.minute / 90) * 100)));
+    const matchId = match["ID"] || Math.random().toString(36).substring(2, 9);
+    const startTimestamp = Date.now() - status.minute * 60 * 1000;
 
-midContent = `
-  <div class="active-match-progress">
-    <span class="result-status-text">مباشر</span>
-    <div class="match-inner-progress-wrap" id="progress-wrap-${matchId}" data-start="${startTimestamp}">
-      <span class="result-status-text live-match-status">${status.label}</span>
-      <div class="percent" id="percent-${matchId}" style="--num:${percent}">
-        <svg>
-          <circle cx="25" cy="25" r="25"></circle>
-          <circle cx="25" cy="25" r="25"></circle>
-        </svg>
-        <div class="number" id="match-time-${matchId}">${status.minute}:00</div>
+    midContent = `
+      <div class="active-match-progress">
+        <span class="result-status-text">مباشر</span>
+        <div class="match-inner-progress-wrap" id="progress-wrap-${matchId}" data-start="${startTimestamp}">
+          <span class="result-status-text live-match-status">${status.label}</span>
+          <div class="percent" id="percent-${matchId}" style="--num:${percent}">
+            <svg>
+              <circle cx="25" cy="25" r="25"></circle>
+              <circle cx="25" cy="25" r="25"></circle>
+            </svg>
+            <div class="number" id="match-time-${matchId}">${status.minute}:00</div>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-`;
-} else if (status.type === "upcoming") {
-midContent = `<div class="result-wrap"><b>${status.time}</b></div>`;
-} else if (status.type === "ended") {
-  const rightGoals = match["Team-Right"]["Goal"];
-  const leftGoals = match["Team-Left"]["Goal"];
-  const rightClass = rightGoals > leftGoals ? "winner" : rightGoals < leftGoals ? "loser" : "";
-  const leftClass = leftGoals > rightGoals ? "winner" : leftGoals < rightGoals ? "loser" : "";
+    `;
+  } else if (status.type === "upcoming") {
+    midContent = `<div class="result-wrap"><b>${status.time}</b></div>`;
+  } else if (status.type === "ended") {
+    const rightGoals = match["Team-Right"]["Goal"];
+    const leftGoals = match["Team-Left"]["Goal"];
+    const rightClass = rightGoals > leftGoals ? "winner" : rightGoals < leftGoals ? "loser" : "";
+    const leftClass = leftGoals > rightGoals ? "winner" : leftGoals < rightGoals ? "loser" : "";
 
-  midContent = `
-    <div class="result-wrap">
-      <span class="result-status-text">انتهت المباراة</span>
-      <b class="match-date">
-        <span class="first-team-result ${rightClass}">${rightGoals}</span>
-        <i>-</i>
-        <span class="second-team-result ${leftClass}">${leftGoals}</span>
-      </b>
-    </div>
-  `;
-  // نضيف class إضافي للمباريات المنتهية
+    midContent = `
+      <div class="result-wrap">
+        <span class="result-status-text">انتهت المباراة</span>
+        <b class="match-date">
+          <span class="first-team-result ${rightClass}">${rightGoals}</span>
+          <i>-</i>
+          <span class="second-team-result ${leftClass}">${leftGoals}</span>
+        </b>
+      </div>
+    `;
+  }
+
+  // HTML النهائي مع الرابط
   return `
-    <div class="inline-match-item ${className} match-with-result">
+    <div class="inline-match-item ${className}" onclick="window.open('${link}', '_blank')">
       <div class="first-team">
         <div class="img"><img src="${match["Team-Right"]["Logo"]}" alt=""></div>
         <b>${match["Team-Right"]["Name"]}</b>
@@ -408,7 +410,7 @@ midContent = `<div class="result-wrap"><b>${status.time}</b></div>`;
       </div>
     </div>
   `;
-}
+};
 
 
 return `<div class="inline-match-item ${className}"> <div class="first-team"> <div class="img"><img src="${match["Team-Right"]["Logo"]}" alt=""></div> <b>${match["Team-Right"]["Name"]}</b> </div> ${midContent} <div class="second-team"> <b>${match["Team-Left"]["Name"]}</b> <div class="img"><img src="${match["Team-Left"]["Logo"]}" alt=""></div> </div> </div> `;
@@ -438,6 +440,10 @@ return `<div class="inline-match-item ${className}"> <div class="first-team"> <d
           });
 
           const html = Object.entries(grouped).map(([cup, list]) => {
+            let matchIndex = 0; // نعد المباريات
+const linksAttr = div.getAttribute("link") || "";
+const linksArray = linksAttr.split(",").map(l => l.trim());
+
             const now = new Date();
             const live = [], soon = [], future = [], ended = [];
 
@@ -993,4 +999,3 @@ return `<div class="inline-match-item ${className}"> <div class="first-team"> <d
     if (percentEl) percentEl.style.setProperty('--num', Math.min(100, (minutes / 90) * 100));
   });
 }, 1000);
-
