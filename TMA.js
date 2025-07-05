@@ -335,7 +335,7 @@ font-size: 14px;
   color: var(--progress-color);
 }
 .inline-match-item.match-live.active-match {
-  justify-content: space-between;
+  justify-content: center;
   gap: 6px;
 }
 
