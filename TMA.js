@@ -159,7 +159,14 @@ JokaMatch {
   font-weight: bold;
   color: var(--text, #BFC3D4);
 }
-
+.first-team-result.winner,
+.second-team-result.winner {
+color: #39DBBF;
+}
+.first-team-result.loser,
+.second-team-result.loser {
+color: #FF3131;
+}
 /* === Responsiveness === */
 @media (max-width: 500px) {
   .inline-match-item {
@@ -219,8 +226,13 @@ time: start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     } else if (status.type === "upcoming") {
       midContent = `<div class="result-wrap"><b>${status.time}</b></div>`;
     } else if (status.type === "ended") {
-      midContent = `<div class="result-wrap"><b>${match["Team-Right"]["Goal"]} - ${match["Team-Left"]["Goal"]}</b></div>`;
-    }
+const rightGoals = match["Team-Right"]["Goal"];
+const leftGoals = match["Team-Left"]["Goal"];
+const rightClass = rightGoals > leftGoals ? "winner" : rightGoals < leftGoals ? "loser" : "";
+const leftClass = leftGoals > rightGoals ? "winner" : leftGoals < rightGoals ? "loser" : "";
+
+midContent = <div class="result-wrap"> <span class="result-status-text">انتهت المباراة</span> <b class="match-date"> <span class="first-team-result ${rightClass}">${rightGoals}</span> <i>-</i> <span class="second-team-result ${leftClass}">${leftGoals}</span> </b> </div> ;
+}
 
     return `
       <div class="inline-match-item ${className}">
