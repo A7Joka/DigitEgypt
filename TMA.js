@@ -5,8 +5,15 @@
     // أضف باقي العملاء هنا
   };
 
-  const metaTag = document.querySelector('meta[name="joka-blog-id"]');
-  const currentBlogId = metaTag?.getAttribute("content");
+  // ✅ جلب Blog ID تلقائي من بلوجر
+  let currentBlogId;
+  try {
+    currentBlogId = window._WidgetManager._GetAllData().blog.blogId;
+  } catch (e) {
+    console.error("❌ لم يتم العثور على Blog ID تلقائيًا");
+    debugger;
+    throw new Error("Unauthorized Access 🚫 [No Blog ID]");
+  }
 
   // الحماية الأساسية
   if (!apiKey || !allowedKeys[apiKey]) {
@@ -21,6 +28,7 @@
     throw new Error("Unauthorized Access 🚫");
   }
 
+  
   const baseURL = "https://script.google.com/macros/s/AKfycby0xGjUv5LAreOP0LMejmekERzMq1QxBrRUbg4tf2QvODOs1GHUYmE_c21Zxdu7Fu6T/exec";
   const containers = document.querySelectorAll("JokaMatch");
 
