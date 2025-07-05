@@ -173,25 +173,33 @@ JokaMatch {
 }
   `;
   document.head.appendChild(style);
-
+  
+function parseTimeWithZone(isoTime, timeZoneOffsetStr) {
+const matchDate = new Date(isoTime);
+const matchOffset = parseInt(timeZoneOffsetStr || "+0") * 60;
+const localOffset = -new Date().getTimezoneOffset(); // local is negative, so we reverse it
+const diffMinutes = localOffset - matchOffset;
+matchDate.setMinutes(matchDate.getMinutes() + diffMinutes);
+return matchDate;
+}
   const formatStatus = (match) => {
-    const now = new Date();
-    const start = new Date(match["Time-Start"]);
-    const timeNow = match["Time-Now"];
-    const status = match["Match-Status"];
+const now = new Date();
+const start = parseTimeWithZone(match["Time-Start"], match["Time-Zone"]);
+const timeNow = match["Time-Now"];
+const status = match["Match-Status"];
 
-    if (status.includes("جارية") || status.includes("شوط")) {
-      const minute = (timeNow > 0 && timeNow <= 130) ? timeNow : 0;
-      return { type: "live", minute, label: status };
-    } else if (status.includes("انتهت")) {
-      return { type: "ended" };
-    } else {
-      return {
-        type: "upcoming",
-        time: start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-    }
-  };
+if (status.includes("جارية") || status.includes("شوط")) {
+const minute = (timeNow > 0 && timeNow <= 130) ? timeNow : 0;
+return { type: "live", minute, label: status };
+} else if (status.includes("انتهت")) {
+return { type: "ended" };
+} else {
+return {
+type: "upcoming",
+time: start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+};
+}
+};
 
   const buildMatchCard = (match) => {
     const status = formatStatus(match);
