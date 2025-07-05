@@ -89,6 +89,7 @@
     const divs = container.querySelectorAll("div[day]");
     divs.forEach(async div => {
       const day = div.getAttribute("day") || "today";
+      const flt = div.getAttribute("flt") || "2";
       const theme = div.getAttribute("theme") || "dark";
 
       div.style.setProperty('--bg', theme === "dark" ? '#151825' : '#f3f3f3');
