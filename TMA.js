@@ -411,10 +411,6 @@ const buildMatchCard = (match, link = "#") => {
     </div>
   `;
 };
-
-
-return `<div class="inline-match-item ${className}"> <div class="first-team"> <div class="img"><img src="${match["Team-Right"]["Logo"]}" alt=""></div> <b>${match["Team-Right"]["Name"]}</b> </div> ${midContent} <div class="second-team"> <b>${match["Team-Left"]["Name"]}</b> <div class="img"><img src="${match["Team-Left"]["Logo"]}" alt=""></div> </div> </div> `;
-};
   containers.forEach(container => {
     const divs = container.querySelectorAll("div[day]");
     divs.forEach(async div => {
