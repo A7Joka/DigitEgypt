@@ -27,6 +27,25 @@
 
   const style = document.createElement("style");
   style.innerHTML = `
+  .live-progress {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+background: conic-gradient(#FF3131 calc(var(--percent, 0%) * 1%), #555 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 12px;
+}
+.goal-number {
+  font-size: 14px;
+  font-weight: bold;
+  min-width: 20px;
+  text-align: center;
+  color: var(--text);
+}
   .inline-match-item {
     display: flex;
     align-items: center;
@@ -132,7 +151,7 @@
         const json = await res.json();
         const matches = json.matches;
 
-       const formatStatus = (match) => {
+   const formatStatus = (match) => {
   const now = new Date();
   const start = new Date(match["Time-Start"]);
   const timeNow = match["Time-Now"];
@@ -140,17 +159,18 @@
   const diffMin = Math.floor((start - now) / 60000);
 
   if (status.includes("جارية") || status.includes("شوط")) {
-    const minute = (timeNow > 0 && timeNow <= 130) ? `${timeNow}` : "غير محددة";
-    return { label: status, minute: minute, type: "live" };
+    const minute = (timeNow > 0 && timeNow <= 130) ? timeNow : 0;
+    return { type: "live", minute, label: status };
   } else if (status.includes("انتهت")) {
-    return { label: "انتهت", type: "ended" };
+    return { type: "ended" };
   } else {
     return {
-      label: start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      type: "upcoming"
+      type: "upcoming",
+      time: start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
   }
 };
+
 
         if (flt === "1") {
           const grouped = {};
@@ -161,71 +181,42 @@
           });
 
           const html = Object.entries(grouped).map(([cup, list]) => {
-            const now = new Date();
-            const live = [], soon = [], future = [], ended = [];
+  const now = new Date();
+  const live = [], soon = [], future = [], ended = [];
 
-            list.forEach(match => {
-              const start = new Date(match["Time-Start"]);
-              const diffMin = Math.floor((start - now) / 60000);
-              const status = match["Match-Status"];
-              if (status.includes("جارية") || status.includes("شوط")) live.push(match);
-              else if (status.includes("انتهت")) ended.push(match);
-              else if (diffMin <= 60 && diffMin > 0) soon.push(match);
-              else future.push(match);
-            });
+  list.forEach(match => {
+    const start = new Date(match["Time-Start"]);
+    const diffMin = Math.floor((start - now) / 60000);
+    const status = match["Match-Status"];
+    if (status.includes("جارية") || status.includes("شوط")) live.push(match);
+    else if (status.includes("انتهت")) ended.push(match);
+    else if (diffMin <= 60 && diffMin > 0) soon.push(match);
+    else future.push(match);
+  });
 
-            const sorted = [...live, ...soon, ...future, ...ended];
-            const section = sorted.map(match => {
-              const statusData = formatStatus(match);
-              const className = statusData.type === "live" ? "match-live" : statusData.type === "upcoming" ? "match-upcoming" : "match-ended";
-              return `
-                <div class="inline-match-item ${className}">
-                  <div class="first-team">
-                    <div class="img"><img src="${match["Team-Right"]["Logo"]}" alt=""></div>
-                    <b>${match["Team-Right"]["Name"]}</b>
-                  </div>
-                  <div class="result-wrap">
-                    <b>${match["Team-Right"]["Goal"]} - ${match["Team-Left"]["Goal"]}</b>
-                  </div>
-                  <div class="second-team">
-                    <b>${match["Team-Left"]["Name"]}</b>
-                    <div class="img"><img src="${match["Team-Left"]["Logo"]}" alt=""></div>
-                  </div>
-                  <div class="match-status">${statusData.label}</div>
-                </div>
-              `;
-            }).join("");
+  const sorted = [...live, ...soon, ...future, ...ended];
 
-            return `<div class="match-section-title">${cup}</div>${section}`;
-          }).join("");
-
-          div.innerHTML = html;
-          return;
-        }
-
-        // FLT = 2 (عرض حسب الحالة لكن مع اسم البطولة)
-        const live = [], upcoming = [], ended = [];
-        matches.forEach(match => {
-          const status = match["Match-Status"];
-          if (status.includes("جارية") || status.includes("شوط")) live.push(match);
-          else if (status.includes("انتهت") || status.includes("إنتهت")) ended.push(match);
-          else upcoming.push(match);
-        });
-
-        const renderSection = (title, list) => {
-  if (!list.length) return "";
-  const items = list.map(match => {
+  // ✅ عرفها هنا
+  const buildMatchCard = (match) => {
     const status = formatStatus(match);
     const className = status.type === "live" ? "match-live" : status.type === "upcoming" ? "match-upcoming" : "match-ended";
+
     let midContent = "";
 
     if (status.type === "live") {
-      midContent = `<div class="live-center">
-        <div class="live-circle">${status.minute}</div>
-        <div class="status-below">${status.label}</div>
-      </div>`;
+const percent = Math.max(0, Math.min(100, Math.round((status.minute / 90) * 100)));
+      midContent = `
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div class="goal-number">${match["Team-Right"]["Goal"]}</div>
+          <div class="live-center">
+            <div class="live-progress" style="--percent:${percent}">${status.minute}</div>
+            <div class="status-below">${status.label}</div>
+          </div>
+          <div class="goal-number">${match["Team-Left"]["Goal"]}</div>
+        </div>
+      `;
     } else if (status.type === "upcoming") {
-      midContent = `<div class="match-time"><b>${status.label}</b></div>`;
+      midContent = `<div class="match-time"><b>${status.time}</b></div>`;
     } else if (status.type === "ended") {
       midContent = `<div class="match-result-center">
         <div class="ended-label">انتهت</div>
@@ -247,10 +238,79 @@
         </div>
       </div>
     `;
-  }).join("");
+  };
 
+  const section = sorted.map(buildMatchCard).join("");
+  return `<div class="match-section-title">${cup}</div>${section}`;
+}).join(""); // <== خارج map
+
+          div.innerHTML = html;
+          return;
+        }
+
+        // FLT = 2 (عرض حسب الحالة لكن مع اسم البطولة)
+        const live = [], upcoming = [], ended = [];
+        matches.forEach(match => {
+          const status = match["Match-Status"];
+          if (status.includes("جارية") || status.includes("شوط")) live.push(match);
+          else if (status.includes("انتهت") || status.includes("إنتهت")) ended.push(match);
+          else upcoming.push(match);
+        });
+
+        const renderSection = (title, list) => {
+  if (!list.length) return "";
+
+  // ✅ عرف الدالة مرة واحدة فوق
+  const buildMatchCard = (match) => {
+    const status = formatStatus(match);
+    const className = status.type === "live" ? "match-live"
+                   : status.type === "upcoming" ? "match-upcoming"
+                   : "match-ended";
+
+    let midContent = "";
+
+    if (status.type === "live") {
+      const percent = Math.min(100, Math.floor((status.minute / 90) * 100));
+      midContent = `
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div class="goal-number">${match["Team-Right"]["Goal"]}</div>
+          <div class="live-center">
+            <div class="live-progress" style="--percent:${percent}">${status.minute}</div>
+            <div class="status-below">${status.label}</div>
+          </div>
+          <div class="goal-number">${match["Team-Left"]["Goal"]}</div>
+        </div>
+      `;
+    } else if (status.type === "upcoming") {
+      midContent = `<div class="match-time"><b>${status.time}</b></div>`;
+    } else if (status.type === "ended") {
+      midContent = `<div class="match-result-center">
+        <div class="ended-label">انتهت</div>
+        <div class="result-score">${match["Team-Right"]["Goal"]} - ${match["Team-Left"]["Goal"]}</div>
+      </div>`;
+    }
+
+    return `
+      <div class="cup-title">${match["Cup-Name"] || "بطولة غير معروفة"}</div>
+      <div class="inline-match-item ${className}">
+        <div class="first-team">
+          <div class="img"><img src="${match["Team-Right"]["Logo"]}" alt=""></div>
+          <b>${match["Team-Right"]["Name"]}</b>
+        </div>
+        ${midContent}
+        <div class="second-team">
+          <b>${match["Team-Left"]["Name"]}</b>
+          <div class="img"><img src="${match["Team-Left"]["Logo"]}" alt=""></div>
+        </div>
+      </div>
+    `;
+  };
+
+  // ✅ نفذ map على الدالة دي
+  const items = list.map(buildMatchCard).join("");
   return `<div class="match-section-title">${title}</div>${items}`;
 };
+
 
         div.innerHTML = `
           ${renderSection("جارية الآن", live)}
