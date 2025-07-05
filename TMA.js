@@ -3,7 +3,7 @@
 (function () {
   // 🔐 إعدادات العميل (تُعدل عند البيع)
   const CLIENT_API_KEY = "ABC123XYZ";
-  const CLIENT_BLOG_ID = "813492376149827";
+  const CLIENT_BLOG_ID = "2325258222068455523";
 
   // 🔒 التحقق من الـ Blog ID الموجود في <meta>
   const blogMeta = document.querySelector('meta[name="joka-blog-id"]');
