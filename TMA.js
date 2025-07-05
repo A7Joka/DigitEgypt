@@ -312,13 +312,6 @@ width: 20px;
 height: 20px;
 }
 
-.inline-match-item .result-wrap {
-margin: 0 10px;
-font-size: 11px;
-width: 50px;
-height: 18px;
-}
-
 .inline-match-item .live {
 font-size: 9px;
 padding: 2px 4px;
