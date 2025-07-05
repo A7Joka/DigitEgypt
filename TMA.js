@@ -581,3 +581,22 @@ globalMatchIndex++;
     });
   });
 })();
+   setInterval(() => {
+  document.querySelectorAll(".match-inner-progress-wrap").forEach(wrapper => {
+    const start = parseInt(wrapper.getAttribute("data-start"));
+    if (!start) return;
+
+    const now = Date.now();
+    const elapsedSeconds = Math.floor((now - start) / 1000);
+    const minutes = Math.floor(elapsedSeconds / 60);
+    const seconds = String(elapsedSeconds % 60).padStart(2, '0');
+    const timeString = `${minutes}:${seconds}`;
+
+    const wrapperId = wrapper.id.replace("progress-wrap-", "");
+    const timeEl = document.getElementById(`match-time-${wrapperId}`);
+    const percentEl = document.getElementById(`percent-${wrapperId}`);
+
+    if (timeEl) timeEl.textContent = timeString;
+    if (percentEl) percentEl.style.setProperty('--num', Math.min(100, (minutes / 90) * 100));
+  });
+}, 1000);
