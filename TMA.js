@@ -130,7 +130,9 @@ divs.forEach(async div => {
             grouped[cup].push(match);
           });
 
-          const html = Object.entries(grouped).map(([cup, list]) => {
+          const html = Object.entries(grouped).map(([cup, list]) => 
+              const now = new Date(); // ✅ ضيفه هنا
+
            const live = [], soon = [], future = [], ended = [];
 
 list.forEach(match => {
