@@ -249,7 +249,7 @@ const percent = Math.max(0, Math.min(100, Math.round((status.minute / 90) * 100)
 midContent = `
 <div class="result-wrap live" style="--percent:${percent}"> <b>${match["Team-Right"]["Goal"]} - ${match["Team-Left"]["Goal"]}</b> </div> `;
 } else if (status.type === "upcoming") {
-midContent = <div class="result-wrap"><b>${status.time}</b></div>;
+midContent = `<div class="result-wrap"><b>${status.time}</b></div>`;
 } else if (status.type === "ended") {
 const rightGoals = match["Team-Right"]["Goal"];
 const leftGoals = match["Team-Left"]["Goal"];
