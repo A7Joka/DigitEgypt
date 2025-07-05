@@ -72,6 +72,14 @@
       margin: 10px 0 5px;
       color: var(--text);
     }
+.match-status {
+  width: 100%;
+  text-align: center;
+  font-size: 11px;
+  margin-top: 5px;
+  color: var(--text);
+}
+
   `;
   document.head.appendChild(style);
 
@@ -90,8 +98,26 @@
         const res = await fetch(`${baseURL}?date=${day}`);
         const json = await res.json();
         const matches = json.matches;
+        const formatStatus = (match) => {
+  const now = new Date();
+  const start = new Date(match["Time-Start"]);
+  const timeNow = match["Time-Now"];
+  const status = match["Match-Status"];
+  const diffMin = Math.floor((start - now) / 60000);
 
-        const now = new Date();
+  if (status.includes("جارية") || status.includes("شوط")) {
+    const minute = (timeNow > 0 && timeNow <= 130) ? `${timeNow}` : "غير محددة";
+    return `${status} – الدقيقة ${minute}`;
+  } else if (status.includes("انتهت")) {
+    return "إنتهت المباراة";
+  } else if (diffMin <= 60 && diffMin > 0) {
+    return "بعد قليل";
+  } else if (diffMin > 60) {
+    return `الساعة ${start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+  } else {
+    return status;
+  }
+};
 
         if (flt === "1") {
           const grouped = {};
@@ -102,24 +128,38 @@
           });
 
           const html = Object.entries(grouped).map(([cup, list]) => {
-            const section = list.map(match => `
-              <div class="inline-match-item">
-                <div class="first-team">
-                  <div class="img"><img src="${match["Team-Right"]["Logo"]}" alt=""></div>
-                  <b>${match["Team-Right"]["Name"]}</b>
-                </div>
-                <div class="result-wrap">
-                  <b>${match["Team-Right"]["Goal"]} - ${match["Team-Left"]["Goal"]}</b>
-                </div>
-                <div class="second-team">
-                  <b>${match["Team-Left"]["Name"]}</b>
-                  <div class="img"><img src="${match["Team-Left"]["Logo"]}" alt=""></div>
-                </div>
-                <div style="width:100%;text-align:center;font-size:11px;margin-top:5px;color:var(--text);">
-                  ${match["Match-Status"]}
-                </div>
-              </div>
-            `).join("");
+           const live = [], soon = [], future = [], ended = [];
+
+list.forEach(match => {
+  const start = new Date(match["Time-Start"]);
+  const diffMin = Math.floor((start - now) / 60000);
+  const status = match["Match-Status"];
+
+  if (status.includes("جارية") || status.includes("شوط")) live.push(match);
+  else if (status.includes("انتهت")) ended.push(match);
+  else if (diffMin <= 60 && diffMin > 0) soon.push(match);
+  else future.push(match);
+});
+
+const sorted = [...live, ...soon, ...future, ...ended];
+const section = sorted.map(match => `
+  <div class="inline-match-item">
+    <div class="first-team">
+      <div class="img"><img src="${match["Team-Right"]["Logo"]}" alt=""></div>
+      <b>${match["Team-Right"]["Name"]}</b>
+    </div>
+    <div class="result-wrap">
+      <b>${match["Team-Right"]["Goal"]} - ${match["Team-Left"]["Goal"]}</b>
+    </div>
+    <div class="second-team">
+      <b>${match["Team-Left"]["Name"]}</b>
+      <div class="img"><img src="${match["Team-Left"]["Logo"]}" alt=""></div>
+    </div>
+    <div style="width:100%;text-align:center;font-size:11px;margin-top:5px;color:var(--text);">
+      ${formatStatus(match)}
+    </div>
+  </div>
+`).join("");
             return `<div class="match-section-title">${cup}</div>${section}`;
           }).join("");
 
@@ -139,20 +179,24 @@
         const renderSection = (title, list) => {
           if (!list.length) return "";
           const items = list.map(match => `
-            <div class="inline-match-item">
-              <div class="first-team">
-                <div class="img"><img src="${match["Team-Right"]["Logo"]}" alt=""></div>
-                <b>${match["Team-Right"]["Name"]}</b>
-              </div>
-              <div class="result-wrap">
-                <b>${match["Team-Right"]["Goal"]} - ${match["Team-Left"]["Goal"]}</b>
-              </div>
-              <div class="second-team">
-                <b>${match["Team-Left"]["Name"]}</b>
-                <div class="img"><img src="${match["Team-Left"]["Logo"]}" alt=""></div>
-              </div>
-            </div>
-          `).join("");
+  <div class="inline-match-item">
+    <div class="first-team">
+      <div class="img"><img src="${match["Team-Right"]["Logo"]}" alt=""></div>
+      <b>${match["Team-Right"]["Name"]}</b>
+    </div>
+    <div class="result-wrap">
+      <b>${match["Team-Right"]["Goal"]} - ${match["Team-Left"]["Goal"]}</b>
+    </div>
+    <div class="second-team">
+      <b>${match["Team-Left"]["Name"]}</b>
+      <div class="img"><img src="${match["Team-Left"]["Logo"]}" alt=""></div>
+    </div>
+    <div style="width:100%;text-align:center;font-size:11px;margin-top:5px;color:var(--text);">
+      ${formatStatus(match)}
+    </div>
+  </div>
+`).join("");
+
           return `<div class="match-section-title">${title}</div>${items}`;
         };
 
