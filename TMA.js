@@ -354,36 +354,51 @@ const buildMatchCard = (match, link = "#") => {
       ? "match-upcoming"
       : "match-ended";
 
+  const rightGoals = match["Team-Right"]["Goal"];
+  const leftGoals = match["Team-Left"]["Goal"];
+  const rightClass = rightGoals > leftGoals ? "winner" : rightGoals < leftGoals ? "loser" : "";
+  const leftClass = leftGoals > rightGoals ? "winner" : leftGoals < rightGoals ? "loser" : "";
+
   let midContent = "";
 
   if (status.type === "live") {
-    const percent = Math.max(0, Math.min(100, Math.round((status.minute / 90) * 100)));
+    const minute = status.minute || 0;
     const matchId = match["ID"] || Math.random().toString(36).substring(2, 9);
-    const startTimestamp = Date.now() - status.minute * 60 * 1000;
+    const startTimestamp = Date.now() - minute * 60 * 1000;
+    const percent = Math.max(0, Math.min(150, Math.round((minute / 90) * 100)));
 
-    midContent = `
+    const isRest =
+      status.label.includes("شوط") &&
+      !status.label.includes("الأول") &&
+      !status.label.includes("الثاني") &&
+      !status.label.includes("بدل");
+
+    const extraMinutes = Math.max(0, minute - 90);
+    const extraDisplay = extraMinutes > 0
+      ? `<span id="extra-time-${matchId}" class="extra-time">+<i id="ex-${matchId}" class="extra-count">${extraMinutes}:00</i> / 5</span>`
+      : "";
+
+    const progressBlock = `
       <div class="active-match-progress">
-        <span class="result-status-text">مباشر</span>
-        <div class="match-inner-progress-wrap" id="progress-wrap-${matchId}" data-start="${startTimestamp}">
+        <span class="result-status-text">${isRest ? "استراحة" : "مباشر"}</span>
+        <div class="match-inner-progress-wrap" id="progress-wrap-${matchId}" ${isRest ? "" : `data-start="${startTimestamp}"`}>
           <span class="result-status-text live-match-status">${status.label}</span>
           <div class="percent" id="percent-${matchId}" style="--num:${percent}">
             <svg>
               <circle cx="25" cy="25" r="25"></circle>
               <circle cx="25" cy="25" r="25"></circle>
             </svg>
-            <div class="number" id="match-time-${matchId}">${status.minute}:00</div>
+            <div class="number" id="match-time-${matchId}">${minute}:00</div>
           </div>
+          ${extraDisplay}
         </div>
       </div>
     `;
+
+    midContent = progressBlock;
   } else if (status.type === "upcoming") {
     midContent = `<div class="result-wrap"><b>${status.time}</b></div>`;
   } else if (status.type === "ended") {
-    const rightGoals = match["Team-Right"]["Goal"];
-    const leftGoals = match["Team-Left"]["Goal"];
-    const rightClass = rightGoals > leftGoals ? "winner" : rightGoals < leftGoals ? "loser" : "";
-    const leftClass = leftGoals > rightGoals ? "winner" : leftGoals < rightGoals ? "loser" : "";
-
     midContent = `
       <div class="result-wrap">
         <span class="result-status-text">انتهت المباراة</span>
@@ -396,17 +411,22 @@ const buildMatchCard = (match, link = "#") => {
     `;
   }
 
-  // HTML النهائي مع الرابط
   return `
     <div class="inline-match-item ${className}" onclick="window.open('${link}', '_blank')">
-      <div class="first-team">
-        <div class="img"><img src="${match["Team-Right"]["Logo"]}" alt=""></div>
-        <b>${match["Team-Right"]["Name"]}</b>
+      <div class="first-team match-team-item">
+        <div class="team---item">
+          <div class="img"><img title="${match["Team-Right"]["Name"]}" src="${match["Team-Right"]["Logo"]}"></div>
+          <b>${match["Team-Right"]["Name"]}</b>
+        </div>
+        <div class="first-team-result team-result ${rightClass}">${rightGoals}</div>
       </div>
       ${midContent}
-      <div class="second-team">
-        <b>${match["Team-Left"]["Name"]}</b>
-        <div class="img"><img src="${match["Team-Left"]["Logo"]}" alt=""></div>
+      <div class="second-team match-team-item">
+        <div class="second-team-result team-result ${leftClass}">${leftGoals}</div>
+        <div class="team---item">
+          <div class="img"><img title="${match["Team-Left"]["Name"]}" src="${match["Team-Left"]["Logo"]}"></div>
+          <b>${match["Team-Left"]["Name"]}</b>
+        </div>
       </div>
     </div>
   `;
