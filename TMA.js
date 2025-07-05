@@ -18,166 +18,167 @@
   }
   if (!currentBlogId || allowedKeys[apiKey] !== currentBlogId) {
     console.error("\uD83D\uDEAB Unauthorized Access");
-    debugger;
     return;
   }
 
   const baseURL = "https://script.google.com/macros/s/AKfycby0xGjUv5LAreOP0LMejmekERzMq1QxBrRUbg4tf2QvODOs1GHUYmE_c21Zxdu7Fu6T/exec";
 
   const style = document.createElement("style");
-  style.innerHTML = ` .inline-match-item {
-      display: flex;
-      align-items: center;
-      min-height: 60px;
-      border-radius: 10px;
-      background: #151825;
-      margin-bottom: 5px;
-      justify-content: center;
-      padding: 18px;
-      position: relative;
-      flex-wrap: wrap;
-    }
+  style.innerHTML = `
+    /* === Joka Match Global Styles === */
 
-    .inline-match-item .first-team,
-    .inline-match-item .second-team {
-      flex: 1;
-    }
+JokaMatch {
+  display: block;
+  text-align: center;
+  font-family: 'Cairo', sans-serif;
+}
 
-    .inline-match-item .first-team .team---item,
-    .inline-match-item .first-team a,
-    .inline-match-item .second-team .team---item,
-    .inline-match-item .second-team a {
-      color: #BFC3D4;
-      font-size: 12px;
-      display: inline-flex;
-      align-items: center;
-    }
+/* === Inline Match Item === */
+.inline-match-item {
+  display: flex;
+  align-items: center;
+  min-height: 60px;
+  border-radius: 10px;
+  background: var(--bg, #151825);
+  margin-bottom: 5px;
+  justify-content: center;
+  padding: 18px;
+  position: relative;
+  flex-wrap: wrap;
+  color: var(--text, #BFC3D4);
+}
 
-    .inline-match-item .first-team .team---item b,
-    .inline-match-item .first-team a b,
-    .inline-match-item .second-team .team---item b,
-    .inline-match-item .second-team a b {
-      font-weight: bold;
-    }
+.inline-match-item .first-team,
+.inline-match-item .second-team {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 12px;
+  font-weight: bold;
+}
 
-    .inline-match-item .first-team .img,
-    .inline-match-item .second-team .img {
-      width: 26px;
-      height: 26px;
-      flex: 0 0 auto;
-      margin-right: 10px;
-      text-align: center;
-    }
+.inline-match-item .img {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-    .inline-match-item .first-team .img img,
-    .inline-match-item .second-team .img img {
-      max-width: 100%;
-      max-height: 100%;
-    }
+.inline-match-item .img img {
+  max-width: 100%;
+  max-height: 100%;
+}
 
-    .inline-match-item .result-wrap {
-      width: 62px;
-      height: 20px;
-      border-radius: 50px;
-      background: #191D2D;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: bold;
-      color: #BFC3D4 !important;
-      margin: 0 15px;
-      padding-top: 4px;
-      position: relative;
-    }
+.inline-match-item .result-wrap {
+  width: 62px;
+  height: 20px;
+  border-radius: 50px;
+  background: var(--result-bg, #191D2D);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--text, #BFC3D4);
+  margin: 0 15px;
+  padding-top: 4px;
+  position: relative;
+}
 
-    .inline-match-item .result-wrap b {
-      font-weight: bold;
-      display: flex;
-      margin-bottom: 2px;
-    }
+.inline-match-item .result-wrap b {
+  margin-bottom: 2px;
+}
 
-    .match-section-title {
-      font-weight: bold;
-      margin: 10px 0 5px;
-      color: #BFC3D4;
-      font-size: 16px;
-    }
+.inline-match-item.match-live .result-wrap {
+  background: conic-gradient(#FF3131 calc(var(--percent, 0%) * 1%), #555 0);
+  color: white;
+}
 
-    .cup-title {
-      width: 100%;
-      font-size: 13px;
-      font-weight: bold;
-      text-align: center;
-      margin-bottom: 6px;
-      color: #BFC3D4;
-    }
+.inline-match-item.match-upcoming .result-wrap {
+  background: var(--result-bg, #191D2D);
+}
 
-    .goal-number {
-      font-size: 14px;
-      font-weight: bold;
-      min-width: 20px;
-      text-align: center;
-      color: #BFC3D4;
-    }
+.inline-match-item.match-ended .result-wrap {
+  background: var(--result-bg, #191D2D);
+}
 
-    .live-progress {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: conic-gradient(#FF3131 calc(var(--percent, 0%) * 1%), #555 0);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: bold;
-      font-size: 12px;
-    }
+.inline-match-item .live {
+  position: absolute;
+  font-size: 10px;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #FF3131;
+  color: white;
+  border-radius: 50px;
+  padding: 2px 6px;
+  font-weight: bold;
+}
 
-    .live-center {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+.match-section-title {
+  font-weight: bold;
+  margin: 10px 0 5px;
+  color: var(--text, #BFC3D4);
+  font-size: 16px;
+}
 
-    .status-below {
-      font-size: 11px;
-      margin-top: 4px;
-      color: #BFC3D4;
-    }
+/* === Cup Title === */
+.cup-title {
+  width: 100%;
+  font-size: 13px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 6px;
+  color: var(--text, #BFC3D4);
+}
 
-    .match-time {
-      font-size: 16px;
-      font-weight: bold;
-      color: #BFC3D4;
-      text-align: center;
-    }
+/* === Utility === */
+.goal-number {
+  font-size: 14px;
+  font-weight: bold;
+  min-width: 20px;
+  text-align: center;
+  color: var(--text, #BFC3D4);
+}
 
-    .match-result-center {
-      text-align: center;
-    }
+.match-result-center {
+  text-align: center;
+}
 
-    .ended-label {
-      font-size: 11px;
-      color: #BFC3D4;
-      margin-bottom: 2px;
-    }
+.ended-label {
+  font-size: 11px;
+  color: var(--text, #BFC3D4);
+  margin-bottom: 2px;
+}
 
-    .result-score {
-      font-size: 16px;
-      font-weight: bold;
-      color: #BFC3D4;
-    }
+.result-score {
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--text, #BFC3D4);
+}
+
+/* === Responsiveness === */
+@media (max-width: 500px) {
+  .inline-match-item {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .inline-match-item .result-wrap {
+    margin: 5px 0;
+  }
+}
   `;
   document.head.appendChild(style);
-
 
   const formatStatus = (match) => {
     const now = new Date();
     const start = new Date(match["Time-Start"]);
     const timeNow = match["Time-Now"];
     const status = match["Match-Status"];
-    const diffMin = Math.floor((start - now) / 60000);
 
     if (status.includes("جارية") || status.includes("شوط")) {
       const minute = (timeNow > 0 && timeNow <= 130) ? timeNow : 0;
@@ -205,7 +206,6 @@
       midContent = `
         <div class="result-wrap live" style="--percent:${percent}">
           <b>${match["Team-Right"]["Goal"]} - ${match["Team-Left"]["Goal"]}</b>
-          <div class="live">${status.minute}'</div>
         </div>
       `;
     } else if (status.type === "upcoming") {
@@ -276,7 +276,6 @@
           return;
         }
 
-        // FLT = 2
         const live = [], upcoming = [], ended = [];
         matches.forEach(match => {
           const status = match["Match-Status"];
