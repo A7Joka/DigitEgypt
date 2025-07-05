@@ -343,20 +343,29 @@ font-size: 14px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 60px;
+  width: 70px;
+  padding: 0 6px;
+  gap: 4px;
+  }
+.inline-match-item.match-live .team---item b {
+  font-size: 11px;
+  text-align: center;
+  line-height: 1.2;
 }
 
 .inline-match-item.match-live .team-result {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: bold;
-  width: 28px;
-  text-align: center;
+  margin-top: 4px;
+  margin-bottom: -2px;
 }
+
 .active-match-progress {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  margin: 0 10px; /* تعطي مساحة بين الدائرة والنتيجة */
 }
 
   `;
