@@ -408,95 +408,75 @@ const buildMatchCard = (match, link = "#") => {
 
   // ✅ كارت المباريات الجارية فقط بتصميم خاص
 if (status.type === "live") {
-  const minute = status.minute || 0;
-  const matchId = match["ID"] || Math.random().toString(36).substring(2, 9);
-  const startTimestamp = Date.now() - minute * 60 * 1000;
-  const percent = Math.min(100, Math.round((minute / 90) * 100));
+const matchId = match["ID"] || Math.random().toString(36).substring(2, 9);
+const rawMinute = match["Time-Now"] || 0;
+const percent = Math.min(100, Math.round((rawMinute / 90) * 100));
 
 const isRest =
-  status.label.includes("شوط") &&
-  !status.label.includes("الأول") &&
-  !status.label.includes("الثاني") &&
-  !status.label.includes("بدل");
+status.label.includes("شوط") &&
+!status.label.includes("الأول") &&
+!status.label.includes("الثاني") &&
+!status.label.includes("بدل");
 
-// كشف الشوط الأول والثاني
 const isFirstHalf = status.label.includes("الأول");
 const isSecondHalf = status.label.includes("الثاني");
 
-// حساب وقت البداية
-const matchStart = parseTimeWithZone(match["Time-Start"], match["Time-Zone"]);
-let adjustedStart = matchStart.getTime();
-
-// حساب الفارق الزمني
-const now = Date.now();
-const elapsedSeconds = Math.floor((now - adjustedStart) / 1000);
-let minutes = Math.floor(elapsedSeconds / 60);
-let seconds = String(elapsedSeconds % 60).padStart(2, '0');
-
-let baseMinute = minutes;
+let baseMinute = rawMinute;
 let extraTime = 0;
 let showExtra = false;
 
-if ((isFirstHalf && minutes > 45) || (isSecondHalf && minutes > 90)) {
-  baseMinute = isFirstHalf ? 45 : 90;
-  extraTime = minutes - baseMinute;
-  showExtra = true;
+if ((isFirstHalf && rawMinute > 45) || (isSecondHalf && rawMinute > 90)) {
+baseMinute = isFirstHalf ? 45 : 90;
+extraTime = rawMinute - baseMinute;
+showExtra = true;
 }
 
-// تعديل العنوان بناءً على الحالة
-let matchLabel = status.label;
+let matchLabel = "مباشر";
 if (isRest) {
-  matchLabel = "استراحة";
+matchLabel = "استراحة";
 } else if (showExtra) {
-  matchLabel = "الوقت الإضافي";
+matchLabel = "الوقت الإضافي";
 }
 
-// التايمر الرئيسي
-const timerDisplay = `${baseMinute}:${seconds}`;
-
-// التايمر الإضافي
+const timerDisplay = ${baseMinute}:00; // الثواني ستُضاف في setInterval
 const extraDisplay = showExtra
-  ? `<span class="extra-time">+<i class="extra-count">${extraTime}:${seconds}</i></span>`
-  : "";
+? <span class="extra-time">+<i class="extra-count">${extraTime}:00</i></span>
+: "";
 
-
-  return `
-    <div class="inline-match-item match-live active-match" onclick="window.open('${link}', '_blank')">
-      <div class="match-team-item">
-        <div class="team---item">
-          <div class="img"><img title="${match["Team-Right"]["Name"]}" src="${match["Team-Right"]["Logo"]}"></div>
-          <b>${match["Team-Right"]["Name"]}</b>
-        </div>
+return `
+<div class="inline-match-item match-live active-match" onclick="window.open('${link}', '_blank')">
+<div class="match-team-item">
+<div class="team---item">
+<div class="img"><img title="${match["Team-Right"]["Name"]}" src="${match["Team-Right"]["Logo"]}"></div>
+<b>${match["Team-Right"]["Name"]}</b>
+</div>
+</div>
+<div class="first-team-result team-result ${rightClass}">${rightGoals}</div><div class="first-team-result team-result ${rightClass}">${rightGoals}</div>
+  <div class="active-match-progress">
+    <span class="result-status-text">${matchLabel}</span>
+    <div class="match-inner-progress-wrap" id="progress-wrap-${matchId}" data-base="${baseMinute}" data-extra="${extraTime}" data-show-extra="${showExtra}">
+      <span class="result-status-text live-match-status">${matchLabel}</span>
+      <div class="percent" id="percent-${matchId}" style="--num:${percent}">
+        <svg>
+          <circle cx="25" cy="25" r="25"></circle>
+          <circle cx="25" cy="25" r="25"></circle>
+        </svg>
+        <div class="number" id="match-time-${matchId}">${timerDisplay}</div>
       </div>
-      <div class="first-team-result team-result ${rightClass}">${rightGoals}</div>
-
-      <div class="active-match-progress">
-  <span class="result-status-text">${matchLabel}</span>
-  <div class="match-inner-progress-wrap" id="progress-wrap-${matchId}" data-start="${adjustedStart}">
-    <span class="result-status-text live-match-status">${matchLabel}</span>
-    <div class="percent" id="percent-${matchId}" style="--num:${percent}">
-      <svg>
-        <circle cx="25" cy="25" r="25"></circle>
-        <circle cx="25" cy="25" r="25"></circle>
-      </svg>
-      <div class="number" id="match-time-${matchId}">${timerDisplay}</div>
+      ${extraDisplay}
     </div>
-    ${extraDisplay}
+  </div>
+
+  <div class="second-team-result team-result ${leftClass}">${leftGoals}</div>
+  <div class="match-team-item">
+    <div class="team---item">
+      <div class="img"><img title="${match["Team-Left"]["Name"]}" src="${match["Team-Left"]["Logo"]}"></div>
+      <b>${match["Team-Left"]["Name"]}</b>
+    </div>
   </div>
 </div>
-
-
-      <div class="second-team-result team-result ${leftClass}">${leftGoals}</div>
-      <div class="match-team-item">
-        <div class="team---item">
-          <div class="img"><img title="${match["Team-Left"]["Name"]}" src="${match["Team-Left"]["Logo"]}"></div>
-          <b>${match["Team-Left"]["Name"]}</b>
-        </div>
-      </div>
-    </div>
-  `;
+`;
 }
-
   // ✅ باقي الكروت (upcoming - ended) بنفس التصميم القديم
   let midContent = "";
 
@@ -626,45 +606,30 @@ globalMatchIndex++;
   });
 })();
 setInterval(() => {
-  document.querySelectorAll(".match-inner-progress-wrap").forEach(wrapper => {
-    const start = parseInt(wrapper.getAttribute("data-start"));
-    if (!start) return;
+document.querySelectorAll(".match-inner-progress-wrap").forEach(wrapper => {
+const timeEl = wrapper.querySelector(".number");
+const percentEl = wrapper.querySelector(".percent");
 
-    const wrapperId = wrapper.id.replace("progress-wrap-", "");
-    const timeEl = document.getElementById(`match-time-${wrapperId}`);
-    const percentEl = document.getElementById(`percent-${wrapperId}`);
-    const labelEl = document.querySelector(`#progress-wrap-${wrapperId} .live-match-status`);
-    const extraEl = document.querySelector(`#progress-wrap-${wrapperId} .extra-time`);
+const base = parseInt(wrapper.dataset.base || "0");
+const extra = parseInt(wrapper.dataset.extra || "0");
+const showExtra = wrapper.dataset.showExtra === "true";
 
-    const now = Date.now();
-    const elapsedSeconds = Math.floor((now - start) / 1000);
-    const minutes = Math.floor(elapsedSeconds / 60);
-    const seconds = String(elapsedSeconds % 60).padStart(2, '0');
+let count = base;
+let seconds = parseInt(wrapper.dataset.seconds || "0");
 
-    let baseMinute = minutes;
-    let display = `${minutes}:${seconds}`;
+seconds = (seconds + 1) % 60;
+if (seconds === 0) count++;
 
-    // تحديد هل هو شوط أول أو ثاني
-    const label = labelEl?.textContent || "";
-    const isFirstHalf = label.includes("الأول");
-    const isSecondHalf = label.includes("الثاني");
+wrapper.dataset.seconds = seconds;
 
-    if (isFirstHalf && minutes > 45) {
-      baseMinute = 45;
-      display = `45:${seconds}`;
-      if (extraEl) extraEl.innerHTML = `+<i class="extra-count">${minutes - 45}:${seconds}</i>`;
-    } else if (isSecondHalf && minutes > 90) {
-      baseMinute = 90;
-      display = `90:${seconds}`;
-      if (extraEl) extraEl.innerHTML = `+<i class="extra-count">${minutes - 90}:${seconds}</i>`;
-    } else {
-      if (extraEl) extraEl.innerHTML = "";
-    }
+const secStr = String(seconds).padStart(2, '0');
+if (timeEl) timeEl.textContent = `${count}:${secStr}`;
+if (percentEl) percentEl.style.setProperty('--num', Math.min(100, (count / 90) * 100));
 
-    // تحديث الوقت المعروض
-    if (timeEl) timeEl.textContent = display;
-
-    // تحديث النسبة
-    if (percentEl) percentEl.style.setProperty('--num', Math.min(100, (baseMinute / 90) * 100));
-  });
+const extraEl = wrapper.querySelector(".extra-count");
+if (extraEl && showExtra) {
+  const liveExtra = count - base;
+  extraEl.textContent = `${liveExtra}:${secStr}`;
+}
+});
 }, 1000);
