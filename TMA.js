@@ -519,7 +519,6 @@ return `
         </svg>
         <div class="number" id="match-time-${matchId}">${timerDisplay}</div>
       </div>
-      ${extraDisplay}
     </div>
   </div>
 
