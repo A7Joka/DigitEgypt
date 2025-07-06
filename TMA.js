@@ -35,9 +35,39 @@ const token = decodeToken(_x + _y + _z); // إعادة فك التوكن
 
 // ثم استخدمه هكذا
 async function fetchMatches(day) {
-  const res = await fetch(`${baseURL}?date=${day}&token=${token}`);
-  const json = await res.json();
-  return json.matches;
+function jsonpRequest(url) {
+return new Promise((resolve, reject) => {
+const callbackFunc = jsonpCallback_${Date.now()}_${Math.floor(Math.random() * 1000)};
+const script = document.createElement("script");
+
+  const timeout = setTimeout(() => {
+    reject(new Error("⏳ Timeout: No response from server"));
+    delete window[callbackFunc];
+    document.head.removeChild(script);
+  }, 10000); // 10 ثواني
+
+  window[callbackFunc] = data => {
+    clearTimeout(timeout);
+    resolve(data);
+    delete window[callbackFunc];
+    document.head.removeChild(script);
+  };
+
+  script.src = `${baseURL}?date=${day}&token=${token}&callback=${callbackFunc}`;
+  script.onerror = () => {
+    clearTimeout(timeout);
+    reject(new Error("❌ Script loading error"));
+    delete window[callbackFunc];
+    document.head.removeChild(script);
+  };
+
+  document.head.appendChild(script);
+});
+}
+
+const json = await jsonpRequest(baseURL);
+return json.matches;
+
 }
 
   const style = document.createElement("style");
