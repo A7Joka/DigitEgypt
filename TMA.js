@@ -37,7 +37,7 @@ const token = decodeToken(_x + _y + _z); // إعادة فك التوكن
 async function fetchMatches(day) {
 function jsonpRequest(url) {
 return new Promise((resolve, reject) => {
-const callbackFunc = jsonpCallback_${Date.now()}_${Math.floor(Math.random() * 1000)};
+const callbackFunc = `jsonpCallback_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 const script = document.createElement("script");
 
   const timeout = setTimeout(() => {
