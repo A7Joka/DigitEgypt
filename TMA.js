@@ -437,7 +437,6 @@ matchLabel = "استراحة";
 } else if (showExtra) {
 matchLabel = "الوقت الإضافي";
 }
-
 const timerDisplay = `${baseMinute}:00`;
 const extraDisplay = showExtra
   ? `<span class="extra-time">+<i class="extra-count">${extraTime}:00</i></span>`
@@ -451,7 +450,7 @@ return `
 <b>${match["Team-Right"]["Name"]}</b>
 </div>
 </div>
-<div class="first-team-result team-result ${rightClass}">${rightGoals}</div><div class="first-team-result team-result ${rightClass}">${rightGoals}</div>
+<div class="first-team-result team-result ${rightClass}">${rightGoals}</div>
   <div class="active-match-progress">
     <span class="result-status-text">${matchLabel}</span>
     <div class="match-inner-progress-wrap" id="progress-wrap-${matchId}" data-base="${baseMinute}" data-extra="${extraTime}" data-show-extra="${showExtra}">
@@ -484,6 +483,11 @@ if (match["Match-Status"].includes("تأجلت")) {
   midContent = `
     <div class="result-wrap">
       <span class="result-status-text">مؤجلة</span>
+      <b class="match-date">
+      <span></span>
+      <i>${status.time}</i>
+      <span></span>
+      </b>
     </div>
   `;
 } else if (status.type === "upcoming") {
