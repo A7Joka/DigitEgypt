@@ -426,7 +426,6 @@ const isSecondHalf = status.label.includes("الثاني");
 // حساب وقت البداية
 const matchStart = parseTimeWithZone(match["Time-Start"], match["Time-Zone"]);
 let adjustedStart = matchStart.getTime();
-if (isSecondHalf) adjustedStart += 15 * 60 * 1000;
 
 // حساب الفارق الزمني
 const now = Date.now();
@@ -501,20 +500,27 @@ const extraDisplay = showExtra
   // ✅ باقي الكروت (upcoming - ended) بنفس التصميم القديم
   let midContent = "";
 
-  if (status.type === "upcoming") {
-    midContent = `<div class="result-wrap"><b>${status.time}</b></div>`;
-  } else if (status.type === "ended") {
-    midContent = `
-      <div class="result-wrap">
-        <span class="result-status-text">انتهت المباراة</span>
-        <b class="match-date">
-          <span class="first-team-result ${rightClass}">${rightGoals}</span>
-          <i>-</i>
-          <span class="second-team-result ${leftClass}">${leftGoals}</span>
-        </b>
-      </div>
-    `;
-  }
+if (match["Match-Status"].includes("تأجلت")) {
+  midContent = `
+    <div class="result-wrap">
+      <span class="result-status-text">مؤجلة</span>
+    </div>
+  `;
+} else if (status.type === "upcoming") {
+  midContent = `<div class="result-wrap"><b>${status.time}</b></div>`;
+} else if (status.type === "ended") {
+  midContent = `
+    <div class="result-wrap">
+      <span class="result-status-text">انتهت المباراة</span>
+      <b class="match-date">
+        <span class="first-team-result ${rightClass}">${rightGoals}</span>
+        <i>-</i>
+        <span class="second-team-result ${leftClass}">${leftGoals}</span>
+      </b>
+    </div>
+  `;
+}
+
 
   return `
     <div class="inline-match-item match-${status.type}" onclick="window.open('${link}', '_blank')">
@@ -619,22 +625,46 @@ globalMatchIndex++;
     });
   });
 })();
-   setInterval(() => {
+setInterval(() => {
   document.querySelectorAll(".match-inner-progress-wrap").forEach(wrapper => {
     const start = parseInt(wrapper.getAttribute("data-start"));
     if (!start) return;
+
+    const wrapperId = wrapper.id.replace("progress-wrap-", "");
+    const timeEl = document.getElementById(`match-time-${wrapperId}`);
+    const percentEl = document.getElementById(`percent-${wrapperId}`);
+    const labelEl = document.querySelector(`#progress-wrap-${wrapperId} .live-match-status`);
+    const extraEl = document.querySelector(`#progress-wrap-${wrapperId} .extra-time`);
 
     const now = Date.now();
     const elapsedSeconds = Math.floor((now - start) / 1000);
     const minutes = Math.floor(elapsedSeconds / 60);
     const seconds = String(elapsedSeconds % 60).padStart(2, '0');
-    const timeString = `${minutes}:${seconds}`;
 
-    const wrapperId = wrapper.id.replace("progress-wrap-", "");
-    const timeEl = document.getElementById(`match-time-${wrapperId}`);
-    const percentEl = document.getElementById(`percent-${wrapperId}`);
+    let baseMinute = minutes;
+    let display = `${minutes}:${seconds}`;
 
-    if (timeEl) timeEl.textContent = timeString;
-    if (percentEl) percentEl.style.setProperty('--num', Math.min(100, (minutes / 90) * 100));
+    // تحديد هل هو شوط أول أو ثاني
+    const label = labelEl?.textContent || "";
+    const isFirstHalf = label.includes("الأول");
+    const isSecondHalf = label.includes("الثاني");
+
+    if (isFirstHalf && minutes > 45) {
+      baseMinute = 45;
+      display = `45:${seconds}`;
+      if (extraEl) extraEl.innerHTML = `+<i class="extra-count">${minutes - 45}:${seconds}</i>`;
+    } else if (isSecondHalf && minutes > 90) {
+      baseMinute = 90;
+      display = `90:${seconds}`;
+      if (extraEl) extraEl.innerHTML = `+<i class="extra-count">${minutes - 90}:${seconds}</i>`;
+    } else {
+      if (extraEl) extraEl.innerHTML = "";
+    }
+
+    // تحديث الوقت المعروض
+    if (timeEl) timeEl.textContent = display;
+
+    // تحديث النسبة
+    if (percentEl) percentEl.style.setProperty('--num', Math.min(100, (baseMinute / 90) * 100));
   });
 }, 1000);
