@@ -27,9 +27,9 @@ function decodeToken(encoded) {
   return atob(encoded);
 }
 
-const _x = "WTlAMmIhTHgjWjh2UCMz"; // هذا هو Base64 لجزء من التوكن
-const _y = "a1F3MV5lUjZ0VW4mTWQ3"; // جزء آخر
-const _z = "U2FjNCo=";             // جزء ثالث
+const _x = "TmluSjBrYSQ4OV9"; // هذا هو Base64 لجزء من التوكن
+const _y = "hV3FUQEx6Lk0hcm"; // جزء آخر
+const _z = "VQMzZjOXkqS3U="; // جزء ثالث
 
 const token = decodeToken(_x + _y + _z); // إعادة فك التوكن
 
