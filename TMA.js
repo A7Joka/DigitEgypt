@@ -627,7 +627,7 @@ const percentEl = wrapper.querySelector(".percent");
 const base = parseInt(wrapper.dataset.base || "0");
 const extra = parseInt(wrapper.dataset.extra || "0");
 const showExtra = wrapper.dataset.showExtra === "true";
-
+if (isRest) return;
 let count = base;
 let seconds = parseInt(wrapper.dataset.seconds || "0");
 
