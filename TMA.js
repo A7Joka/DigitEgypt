@@ -1,41 +1,25 @@
 (function () {
-const apiKey = document.currentScript.getAttribute("api-key");
-const containers = document.querySelectorAll("JokaMatch");
+  const apiKey = document.currentScript.getAttribute("api-key");
+  const containers = document.querySelectorAll("JokaMatch");
 
-// ⛔ لا تعرض أي حاجة لو مفيش عناصر
-if (containers.length === 0) return;
+  const allowedKeys = {
+    "ABC123XYZ": "2325258222068455523"
+  };
 
-// ✅ هنا بتربط الـ API Key مع الـ Blog ID
-const allowedKeys = {
-  "ABC123XYZ": "2325258222068455523" // مفتاح = BlogID
-};
-
-let currentBlogId = null;
-
-try {
-  if (window._WidgetManager && typeof _WidgetManager._GetAllData === "function") {
-    currentBlogId = _WidgetManager._GetAllData().blog.blogId;
+  let currentBlogId = null;
+  try {
+    if (window._WidgetManager && typeof _WidgetManager._GetAllData === "function") {
+      currentBlogId = _WidgetManager._GetAllData().blog.blogId;
+    }
+  } catch (e) {}
+  if (!currentBlogId) {
+    const meta = document.querySelector('meta[name="joka-blog-id"]');
+    currentBlogId = meta?.getAttribute("content") || null;
   }
-} catch (e) {
-  console.warn("⚠️ Error getting blogId:", e);
-}
-
-// 🛡️ التحقق الصارم
-if (!currentBlogId || allowedKeys[apiKey] !== currentBlogId) {
-  console.error("⛔ Unauthorized Access - BlogID or API Key mismatch");
-
-  containers.forEach(el => {
-    el.innerHTML = `
-      <div style="color: red; text-align: center; padding: 20px; border-radius: 10px; background: #1e1e1e; font-family: system-ui">
-        ⛔ غير مصرح لك باستخدام هذه الأداة<br/>
-        <a href="https://wa.me/201234567890" target="_blank" style="color: #39DBBF; text-decoration: none; font-weight: bold;">تواصل مع المطور</a>
-      </div>
-    `;
-  });
-
-  // 🛑 وقف التنفيذ
-  throw new Error("Access Denied by NinJoka Security");
-}
+  if (!currentBlogId || allowedKeys[apiKey] !== currentBlogId) {
+    console.error("\uD83D\uDEAB Unauthorized Access");
+    return;
+  }
 
   const encoded = "aHR0cHM6Ly9zY3JpcHQuZ29vZ2xlLmNvbS9tYWNyb3Mvcy9BS2Z5Y2J5MHhHalV2NUxBcmVPUDBMTWVqbWVrRVJ6TXExUXhCclJVYmc0dGYyUXZPRE9zMUdIVVltRV9jMjFaeGR1N0Z1NlQvZXhlYw==";
 const baseURL = atob(encoded);
@@ -706,4 +690,3 @@ if (extraEl && showExtra) {
 }
 });
 }, 1000);
-
