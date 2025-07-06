@@ -416,36 +416,40 @@ const buildMatchCard = (match, link = "#") => {
 
   // ✅ كارت المباريات الجارية فقط بتصميم خاص
 if (status.type === "live") {
-  const matchId = match["ID"] || Math.random().toString(36).substring(2, 9);
-  const rawMinute = match["Time-Now"] || 0;
-  const baseMinute = (rawMinute > 130 || rawMinute < 0) ? 0 : rawMinute;
-  const percent = Math.min(100, Math.round((baseMinute / 90) * 100));
+const matchId = match["ID"] || Math.random().toString(36).substring(2, 9);
+const rawMinute = match["Time-Now"] || 0;
+const percent = Math.min(100, Math.round((rawMinute / 90) * 100));
 
-  const isRest =
-    status.label.includes("شوط") &&
-    !status.label.includes("الأول") &&
-    !status.label.includes("الثاني") &&
-    !status.label.includes("بدل");
+const isRest =
+status.label.includes("شوط") &&
+!status.label.includes("الأول") &&
+!status.label.includes("الثاني") &&
+!status.label.includes("بدل");
 
-  const isFirstHalf = status.label.includes("الأول");
-  const isSecondHalf = status.label.includes("الثاني");
+const isFirstHalf = status.label.includes("الأول");
+const isSecondHalf = status.label.includes("الثاني");
 
-  let matchTopLabel = "مباشر";
-  let matchBottomLabel = status.label;
-  let extraDisplay = "";
+let baseMinute = rawMinute;
+let extraTime = 0;
+let showExtra = false;
 
-  if (isRest) {
-    matchTopLabel = "استراحة";
-    matchBottomLabel = "متوقفة";
-  } else if ((isFirstHalf && baseMinute > 45) || (isSecondHalf && baseMinute > 90)) {
-    const maxLimit = isFirstHalf ? 45 : 90;
-    const extraTime = baseMinute - maxLimit;
-    matchTopLabel = "الوقت الإضافي";
-    matchBottomLabel = `<span class="extra-time">+<i class="extra-count">${extraTime}:00</i></span>`;
-  }
+if ((isFirstHalf && rawMinute > 45) || (isSecondHalf && rawMinute > 90)) {
+baseMinute = isFirstHalf ? 45 : 90;
+extraTime = rawMinute - baseMinute;
+showExtra = true;
+}
 
-  const timerDisplay = `${baseMinute}:00`;
+let matchLabel = "مباشر";
+if (isRest) {
+matchLabel = "استراحة";
+} else if (showExtra) {
+matchLabel = "الوقت الإضافي";
+}
 
+const timerDisplay = `${baseMinute}:00`; // الثواني ستُضاف في setInterval
+const extraDisplay = showExtra
+? `<span class="extra-time">+<i class="extra-count">${extraTime}:00</i></span>`
+: "";
 
 return `
 <div class="inline-match-item match-live active-match" onclick="window.open('${link}', '_blank')">
@@ -457,18 +461,19 @@ return `
 </div>
 <div class="first-team-result team-result ${rightClass}">${rightGoals}</div>
   <div class="active-match-progress">
-  <span class="result-status-text">${matchTopLabel}</span>
-<div class="match-inner-progress-wrap" id="progress-wrap-${matchId}">
-  <span class="result-status-text live-match-status">${matchBottomLabel}</span>
-  <div class="percent" id="percent-${matchId}" style="--num:${percent}">
-    <svg>
-      <circle cx="25" cy="25" r="25"></circle>
-      <circle cx="25" cy="25" r="25"></circle>
-    </svg>
-    <div class="number" id="match-time-${matchId}">${baseMinute}:00</div>
+    <span class="result-status-text">${matchLabel}</span>
+    <div class="match-inner-progress-wrap" id="progress-wrap-${matchId}" data-base="${baseMinute}" data-extra="${extraTime}" data-show-extra="${showExtra}">
+      <span class="result-status-text live-match-status">${matchLabel}</span>
+      <div class="percent" id="percent-${matchId}" style="--num:${percent}">
+        <svg>
+          <circle cx="25" cy="25" r="25"></circle>
+          <circle cx="25" cy="25" r="25"></circle>
+        </svg>
+        <div class="number" id="match-time-${matchId}">${timerDisplay}</div>
+      </div>
+      ${extraDisplay}
+    </div>
   </div>
-</div>
-
 
   <div class="second-team-result team-result ${leftClass}">${leftGoals}</div>
   <div class="match-team-item">
@@ -480,6 +485,8 @@ return `
 </div>
 `;
 }
+
+
   // ✅ باقي الكروت (upcoming - ended) بنفس التصميم القديم
   let midContent = "";
 
@@ -617,7 +624,6 @@ setInterval(() => {
 document.querySelectorAll(".match-inner-progress-wrap").forEach(wrapper => {
 const timeEl = wrapper.querySelector(".number");
 const percentEl = wrapper.querySelector(".percent");
-
 const base = parseInt(wrapper.dataset.base || "0");
 const extra = parseInt(wrapper.dataset.extra || "0");
 const showExtra = wrapper.dataset.showExtra === "true";
@@ -641,3 +647,4 @@ if (extraEl && showExtra) {
 }
 });
 }, 1000);
+
