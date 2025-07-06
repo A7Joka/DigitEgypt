@@ -53,7 +53,8 @@ const script = document.createElement("script");
     document.head.removeChild(script);
   };
 
-  script.src = `${baseURL}?date=${day}&token=${token}&callback=${callbackFunc}`;
+const safeToken = encodeURIComponent(token);
+script.src = `${baseURL}?date=${day}&token=${safeToken}&callback=${callbackFunc}`;
   script.onerror = () => {
     clearTimeout(timeout);
     reject(new Error("❌ Script loading error"));
