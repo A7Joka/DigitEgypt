@@ -413,25 +413,53 @@ if (status.type === "live") {
   const startTimestamp = Date.now() - minute * 60 * 1000;
   const percent = Math.min(100, Math.round((minute / 90) * 100));
 
-  const isRest =
-    status.label.includes("شوط") &&
-    !status.label.includes("الأول") &&
-    !status.label.includes("الثاني") &&
-    !status.label.includes("بدل");
+const isRest =
+  status.label.includes("شوط") &&
+  !status.label.includes("الأول") &&
+  !status.label.includes("الثاني") &&
+  !status.label.includes("بدل");
 
-  const isFirstHalf = status.label.includes("الأول");
-  const isSecondHalf = status.label.includes("الثاني");
+// كشف الشوط الأول والثاني
+const isFirstHalf = status.label.includes("الأول");
+const isSecondHalf = status.label.includes("الثاني");
 
-  let extraMinutes = 0;
-  if (isFirstHalf && minute > 45) {
-    extraMinutes = minute - 45;
-  } else if (isSecondHalf && minute > 90) {
-    extraMinutes = minute - 90;
-  }
+// حساب وقت البداية
+const matchStart = parseTimeWithZone(match["Time-Start"], match["Time-Zone"]);
+let adjustedStart = matchStart.getTime();
+if (isSecondHalf) adjustedStart += 15 * 60 * 1000;
 
-  const extraDisplay = extraMinutes > 0
-    ? `<span class="extra-time">+<i class="extra-count">${extraMinutes}:00</i></span>`
-    : "";
+// حساب الفارق الزمني
+const now = Date.now();
+const elapsedSeconds = Math.floor((now - adjustedStart) / 1000);
+let minutes = Math.floor(elapsedSeconds / 60);
+let seconds = String(elapsedSeconds % 60).padStart(2, '0');
+
+let baseMinute = minutes;
+let extraTime = 0;
+let showExtra = false;
+
+if ((isFirstHalf && minutes > 45) || (isSecondHalf && minutes > 90)) {
+  baseMinute = isFirstHalf ? 45 : 90;
+  extraTime = minutes - baseMinute;
+  showExtra = true;
+}
+
+// تعديل العنوان بناءً على الحالة
+let matchLabel = status.label;
+if (isRest) {
+  matchLabel = "استراحة";
+} else if (showExtra) {
+  matchLabel = "الوقت الإضافي";
+}
+
+// التايمر الرئيسي
+const timerDisplay = `${baseMinute}:${seconds}`;
+
+// التايمر الإضافي
+const extraDisplay = showExtra
+  ? `<span class="extra-time">+<i class="extra-count">${extraTime}:${seconds}</i></span>`
+  : "";
+
 
   return `
     <div class="inline-match-item match-live active-match" onclick="window.open('${link}', '_blank')">
@@ -444,19 +472,20 @@ if (status.type === "live") {
       <div class="first-team-result team-result ${rightClass}">${rightGoals}</div>
 
       <div class="active-match-progress">
-        <span class="result-status-text">${isRest ? "استراحة" : "مباشر"}</span>
-        <div class="match-inner-progress-wrap" id="progress-wrap-${matchId}" ${isRest ? "" : `data-start="${startTimestamp}"`}>
-          <span class="result-status-text live-match-status">${status.label}</span>
-          <div class="percent" id="percent-${matchId}" style="--num:${percent}">
-            <svg>
-              <circle cx="25" cy="25" r="25"></circle>
-              <circle cx="25" cy="25" r="25"></circle>
-            </svg>
-            <div class="number" id="match-time-${matchId}">${minute}:00</div>
-          </div>
-          ${extraDisplay}
-        </div>
-      </div>
+  <span class="result-status-text">${matchLabel}</span>
+  <div class="match-inner-progress-wrap" id="progress-wrap-${matchId}" data-start="${adjustedStart}">
+    <span class="result-status-text live-match-status">${matchLabel}</span>
+    <div class="percent" id="percent-${matchId}" style="--num:${percent}">
+      <svg>
+        <circle cx="25" cy="25" r="25"></circle>
+        <circle cx="25" cy="25" r="25"></circle>
+      </svg>
+      <div class="number" id="match-time-${matchId}">${timerDisplay}</div>
+    </div>
+    ${extraDisplay}
+  </div>
+</div>
+
 
       <div class="second-team-result team-result ${leftClass}">${leftGoals}</div>
       <div class="match-team-item">
