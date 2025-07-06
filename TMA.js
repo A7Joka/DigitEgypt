@@ -34,7 +34,11 @@ const _z = "U2FjNCo=";             // جزء ثالث
 const token = decodeToken(_x + _y + _z); // إعادة فك التوكن
 
 // ثم استخدمه هكذا
-const res = await fetch(`${baseURL}?date=${day}&token=${token}`);
+async function fetchMatches(day) {
+  const res = await fetch(`${baseURL}?date=${day}&token=${token}`);
+  const json = await res.json();
+  return json.matches;
+}
 
   const style = document.createElement("style");
   style.innerHTML = `
@@ -561,10 +565,7 @@ div.style.setProperty('--progress-color', theme === "dark" ? '#39DBBF' : '#007ac
 const linksAttr = div.getAttribute("link") || "";
 const linksArray = linksAttr.split(",").map(l => l.trim());
       try {
-        const res = await fetch(`${baseURL}?date=${day}`);
-        const json = await res.json();
-        const matches = json.matches;
-
+        const matches = await fetchMatches(day);
         if (flt === "1") {
           const grouped = {};
           matches.forEach(match => {
