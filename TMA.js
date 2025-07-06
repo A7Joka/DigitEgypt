@@ -416,47 +416,36 @@ const buildMatchCard = (match, link = "#") => {
 
   // ✅ كارت المباريات الجارية فقط بتصميم خاص
 if (status.type === "live") {
-const matchId = match["ID"] || Math.random().toString(36).substring(2, 9);
-const rawMinute = match["Time-Now"] || 0;
-const percent = Math.min(100, Math.round((rawMinute / 90) * 100));
+  const matchId = match["ID"] || Math.random().toString(36).substring(2, 9);
+  const rawMinute = match["Time-Now"] || 0;
+  const baseMinute = (rawMinute > 130 || rawMinute < 0) ? 0 : rawMinute;
+  const percent = Math.min(100, Math.round((baseMinute / 90) * 100));
 
-const isRest =
-status.label.includes("شوط") &&
-!status.label.includes("الأول") &&
-!status.label.includes("الثاني") &&
-!status.label.includes("بدل");
+  const isRest =
+    status.label.includes("شوط") &&
+    !status.label.includes("الأول") &&
+    !status.label.includes("الثاني") &&
+    !status.label.includes("بدل");
 
-const isFirstHalf = status.label.includes("الأول");
-const isSecondHalf = status.label.includes("الثاني");
+  const isFirstHalf = status.label.includes("الأول");
+  const isSecondHalf = status.label.includes("الثاني");
 
-let baseMinute = rawMinute;
-let extraTime = 0;
-let showExtra = false;
+  let matchTopLabel = "مباشر";
+  let matchBottomLabel = status.label;
+  let extraDisplay = "";
 
-if ((isFirstHalf && rawMinute > 45) || (isSecondHalf && rawMinute > 90)) {
-baseMinute = isFirstHalf ? 45 : 90;
-extraTime = rawMinute - baseMinute;
-showExtra = true;
-}
+  if (isRest) {
+    matchTopLabel = "استراحة";
+    matchBottomLabel = "متوقفة";
+  } else if ((isFirstHalf && baseMinute > 45) || (isSecondHalf && baseMinute > 90)) {
+    const maxLimit = isFirstHalf ? 45 : 90;
+    const extraTime = baseMinute - maxLimit;
+    matchTopLabel = "الوقت الإضافي";
+    matchBottomLabel = `<span class="extra-time">+<i class="extra-count">${extraTime}:00</i></span>`;
+  }
 
-let labelTop = "";
-let labelBottom = "";
+  const timerDisplay = `${baseMinute}:00`;
 
-if (showExtra) {
-  labelTop = "الوقت الإضافي";
-  labelBottom = extraDisplay;
-} else if (isRest) {
-  labelTop = "استراحة";
-  labelBottom = "نهاية الشوط الأول";
-} else {
-  labelTop = "مباشر";
-  labelBottom = status.label; // مثل "الشوط الأول" أو "الشوط الثاني"
-}
-
-const timerDisplay = `${baseMinute}:00`;
-const extraDisplay = showExtra
-  ? `<span class="extra-time">+<i class="extra-count">${extraTime}:00</i></span>`
-  : "";
 
 return `
 <div class="inline-match-item match-live active-match" onclick="window.open('${link}', '_blank')">
@@ -468,17 +457,17 @@ return `
 </div>
 <div class="first-team-result team-result ${rightClass}">${rightGoals}</div>
   <div class="active-match-progress">
-  <div class="status-text-top">${labelTop}</div>
-  <div class="match-inner-progress-wrap" id="progress-wrap-${matchId}" ${isRest ? "" : `data-start="${Date.now() - rawMinute * 60000}"`}>
-    <div class="percent" id="percent-${matchId}" style="--num:${percent}">
-      <svg>
-        <circle cx="25" cy="25" r="25"></circle>
-        <circle cx="25" cy="25" r="25"></circle>
-      </svg>
-      <div class="number" id="match-time-${matchId}">${timerDisplay}</div>
-    </div>
+  <span class="result-status-text">${matchTopLabel}</span>
+<div class="match-inner-progress-wrap" id="progress-wrap-${matchId}">
+  <span class="result-status-text live-match-status">${matchBottomLabel}</span>
+  <div class="percent" id="percent-${matchId}" style="--num:${percent}">
+    <svg>
+      <circle cx="25" cy="25" r="25"></circle>
+      <circle cx="25" cy="25" r="25"></circle>
+    </svg>
+    <div class="number" id="match-time-${matchId}">${baseMinute}:00</div>
   </div>
-  <div class="status-text-bottom">${labelBottom}</div>
+  ${extraDisplay}
 </div>
 
 
