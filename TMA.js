@@ -444,9 +444,9 @@ if (status.type === "live") {
       <div class="first-team-result team-result ${rightClass}">${rightGoals}</div>
 
       <div class="active-match-progress">
-        <span class="result-status-text">${isRest ? "استراحة" : "مباشر"}</span>
+<span class="result-status-text">${isRest ? "استراحة" : (extraMinutes > 0 ? "وقت إضافي" : "مباشر")}</span>
         <div class="match-inner-progress-wrap" id="progress-wrap-${matchId}" ${isRest ? "" : `data-start="${startTimestamp}"`}>
-          <span class="result-status-text live-match-status">${status.label}</span>
+${extraMinutes === 0 ? `<span class="result-status-text live-match-status">${status.label}</span>` : ""}
           <div class="percent" id="percent-${matchId}" style="--num:${percent}">
             <svg>
               <circle cx="25" cy="25" r="25"></circle>
@@ -590,22 +590,39 @@ globalMatchIndex++;
     });
   });
 })();
-   setInterval(() => {
+setInterval(() => {
   document.querySelectorAll(".match-inner-progress-wrap").forEach(wrapper => {
     const start = parseInt(wrapper.getAttribute("data-start"));
     if (!start) return;
 
     const now = Date.now();
     const elapsedSeconds = Math.floor((now - start) / 1000);
-    const minutes = Math.floor(elapsedSeconds / 60);
+    const totalMinutes = Math.floor(elapsedSeconds / 60);
     const seconds = String(elapsedSeconds % 60).padStart(2, '0');
-    const timeString = `${minutes}:${seconds}`;
 
     const wrapperId = wrapper.id.replace("progress-wrap-", "");
     const timeEl = document.getElementById(`match-time-${wrapperId}`);
     const percentEl = document.getElementById(`percent-${wrapperId}`);
+    const extraEl = document.getElementById(`ex-${wrapperId}`);
 
-    if (timeEl) timeEl.textContent = timeString;
-    if (percentEl) percentEl.style.setProperty('--num', Math.min(100, (minutes / 90) * 100));
+    let baseMinute = totalMinutes;
+    let extra = 0;
+
+    if (totalMinutes > 90) {
+      baseMinute = 90;
+      extra = totalMinutes - 90;
+    } else if (totalMinutes > 45) {
+      baseMinute = 45;
+      extra = totalMinutes - 45;
+    }
+
+    // ⏱ عداد الوقت الأساسي (يتوقف عند 45 أو 90)
+    if (timeEl) timeEl.textContent = `${baseMinute}:${seconds}`;
+
+    // 🔁 نسبة التقدم (لا تتعدى 100%)
+    if (percentEl) percentEl.style.setProperty('--num', Math.min(100, (baseMinute / 90) * 100));
+
+    // 🟨 وقت إضافي أسفل الدائرة
+    if (extraEl) extraEl.textContent = `${extra}:${seconds}`;
   });
 }, 1000);
