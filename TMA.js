@@ -438,7 +438,7 @@ matchLabel = "استراحة";
 matchLabel = "الوقت الإضافي";
 }
 
-const timerDisplay = `${baseMinute}:${seconds}`;
+const timerDisplay = `${baseMinute}:00`;
 const extraDisplay = showExtra
   ? `<span class="extra-time">+<i class="extra-count">${extraTime}:00</i></span>`
   : "";
