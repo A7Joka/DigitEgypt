@@ -440,8 +440,8 @@ matchLabel = "الوقت الإضافي";
 
 const timerDisplay = `${baseMinute}:${seconds}`;
 const extraDisplay = showExtra
-? <span class="extra-time">+<i class="extra-count">${extraTime}:00</i></span>
-: "";
+  ? `<span class="extra-time">+<i class="extra-count">${extraTime}:00</i></span>`
+  : "";
 
 return `
 <div class="inline-match-item match-live active-match" onclick="window.open('${link}', '_blank')">
