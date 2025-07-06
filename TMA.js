@@ -486,19 +486,19 @@ baseMinute = isFirstHalf ? 45 : 90;
 extraTime = rawMinute - baseMinute;
 showExtra = true;
 }
-
-let matchLabel = "مباشر";
-if (isRest) {
-matchLabel = "استراحة";
-} else if (showExtra) {
-matchLabel = "الوقت الإضافي";
-}
-
 const timerDisplay = `${baseMinute}:00`; // الثواني ستُضاف في setInterval
 const extraDisplay = showExtra
 ? `<span class="extra-time">+<i class="extra-count">${extraTime}:00</i></span>`
 : "";
-
+let matchLabelt = "مباشر";
+let matchLabelb= match["Match-Status"];
+  if (isRest) {
+matchLabelt = "استراحة";
+matchLabelb = "نهاية الشوط"
+} else if (showExtra) {
+matchLabelt = "الوقت الإضافي";
+matchLabelb = `${extraDisplay}`;
+}
 return `
 <div class="inline-match-item match-live active-match" onclick="window.open('${link}', '_blank')">
 <div class="match-team-item">
@@ -509,9 +509,9 @@ return `
 </div>
 <div class="first-team-result team-result ${rightClass}">${rightGoals}</div>
   <div class="active-match-progress">
-    <span class="result-status-text">${matchLabel}</span>
+    <span class="result-status-text">${matchLabelt}</span>
     <div class="match-inner-progress-wrap" id="progress-wrap-${matchId}" data-base="${baseMinute}" data-extra="${extraTime}" data-show-extra="${showExtra}">
-      <span class="result-status-text live-match-status">${matchLabel}</span>
+      <span class="result-status-text live-match-status">${matchLabelb}</span>
       <div class="percent" id="percent-${matchId}" style="--num:${percent}">
         <svg>
           <circle cx="25" cy="25" r="25"></circle>
