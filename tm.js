@@ -58,7 +58,11 @@ containers.forEach(async container => {
   // 🔗 رابط البروكسي الآمن
   const url = `https://joka.abdallah-hussein193193.workers.dev/?ts=${ts}&sig=${sig}&date=${encodeURIComponent(day)}`;
 
-  fetch(url)
+  fetch(url, {
+  headers: {
+    "X-From-Joka": "YES"
+  }
+})
     .then(res => res.text())
     .then(data => {
       try {
