@@ -21,7 +21,20 @@
     return;
   }
 
-  const baseURL = "https://script.google.com/macros/s/AKfycby0xGjUv5LAreOP0LMejmekERzMq1QxBrRUbg4tf2QvODOs1GHUYmE_c21Zxdu7Fu6T/exec";
+  const encoded = "aHR0cHM6Ly9zY3JpcHQuZ29vZ2xlLmNvbS9tYWNyb3Mvcy9BS2Z5Y2J5MHhHSlV2NUxBcmVPUDBMTWVqbWVrRVJ6TXExUXhCclJVYmc0dGYyUXZPRE9zMUdIVVltRV9jMjFaWHV6RnU2VA==";
+const baseURL = atob(encoded);
+function decodeToken(encoded) {
+  return atob(encoded);
+}
+
+const _x = "WTlAMmIhTHgjWjh2UCMz"; // هذا هو Base64 لجزء من التوكن
+const _y = "a1F3MV5lUjZ0VW4mTWQ3"; // جزء آخر
+const _z = "U2FjNCo=";             // جزء ثالث
+
+const token = decodeToken(_x + _y + _z); // إعادة فك التوكن
+
+// ثم استخدمه هكذا
+const res = await fetch(`${baseURL}?date=${day}&token=${token}`);
 
   const style = document.createElement("style");
   style.innerHTML = `
