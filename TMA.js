@@ -65,7 +65,7 @@ const script = document.createElement("script");
 });
 }
 
-const json = await jsonpRequest(baseURL);
+const json = await jsonpRequest(`${baseURL}?date=${day}&token=${encodeURIComponent(token)}`);
 return json.matches;
 
 }
