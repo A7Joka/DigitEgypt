@@ -367,6 +367,14 @@ font-size: 14px;
   justify-content: center;
   margin: 0 10px; /* تعطي مساحة بين الدائرة والنتيجة */
 }
+.status-text-top,
+.status-text-bottom {
+  font-size: 10px;
+  font-weight: bold;
+  text-align: center;
+  color: var(--text, #BFC3D4);
+  margin: 2px 0;
+}
 
   `;
   document.head.appendChild(style);
@@ -431,12 +439,20 @@ extraTime = rawMinute - baseMinute;
 showExtra = true;
 }
 
-let matchLabel = "مباشر";
-if (isRest) {
-matchLabel = "استراحة";
-} else if (showExtra) {
-matchLabel = "الوقت الإضافي";
+let labelTop = "";
+let labelBottom = "";
+
+if (showExtra) {
+  labelTop = "الوقت الإضافي";
+  labelBottom = extraDisplay;
+} else if (isRest) {
+  labelTop = "استراحة";
+  labelBottom = "نهاية الشوط الأول";
+} else {
+  labelTop = "مباشر";
+  labelBottom = status.label; // مثل "الشوط الأول" أو "الشوط الثاني"
 }
+
 const timerDisplay = `${baseMinute}:00`;
 const extraDisplay = showExtra
   ? `<span class="extra-time">+<i class="extra-count">${extraTime}:00</i></span>`
@@ -452,19 +468,19 @@ return `
 </div>
 <div class="first-team-result team-result ${rightClass}">${rightGoals}</div>
   <div class="active-match-progress">
-    <span class="result-status-text">${matchLabel}</span>
-    <div class="match-inner-progress-wrap" id="progress-wrap-${matchId}" data-base="${baseMinute}" data-extra="${extraTime}" data-show-extra="${showExtra}">
-      <span class="result-status-text live-match-status">${matchLabel}</span>
-      <div class="percent" id="percent-${matchId}" style="--num:${percent}">
-        <svg>
-          <circle cx="25" cy="25" r="25"></circle>
-          <circle cx="25" cy="25" r="25"></circle>
-        </svg>
-        <div class="number" id="match-time-${matchId}">${timerDisplay}</div>
-      </div>
-      ${extraDisplay}
+  <div class="status-text-top">${labelTop}</div>
+  <div class="match-inner-progress-wrap" id="progress-wrap-${matchId}" ${isRest ? "" : `data-start="${Date.now() - rawMinute * 60000}"`}>
+    <div class="percent" id="percent-${matchId}" style="--num:${percent}">
+      <svg>
+        <circle cx="25" cy="25" r="25"></circle>
+        <circle cx="25" cy="25" r="25"></circle>
+      </svg>
+      <div class="number" id="match-time-${matchId}">${timerDisplay}</div>
     </div>
   </div>
+  <div class="status-text-bottom">${labelBottom}</div>
+</div>
+
 
   <div class="second-team-result team-result ${leftClass}">${leftGoals}</div>
   <div class="match-team-item">
