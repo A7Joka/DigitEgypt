@@ -1,4 +1,23 @@
 (function () {
+  if (window.top !== window.self) {
+    document.body.innerHTML = "";
+    alert("⛔ لا يمكنك تحميل هذه الصفحة بهذه الطريقة.");
+    throw new Error("Blocked iframe");
+  }
+
+  // كشف أدوات scraping الشائعة
+  const suspicious = [
+    "HeadlessChrome", "puppeteer", "phantom", "slimer", "node.js"
+  ];
+
+  const ua = navigator.userAgent.toLowerCase();
+  for (let s of suspicious) {
+    if (ua.includes(s.toLowerCase())) {
+      document.body.innerHTML = "";
+      alert("⛔ استخدام أدوات غير مصرح بها.");
+      throw new Error("Blocked bot");
+    }
+  }
   const apiKey = document.currentScript.getAttribute("api-key");
   const containers = document.querySelectorAll("JokaMatch");
 
