@@ -20,19 +20,6 @@
     console.error("\uD83D\uDEAB Unauthorized Access");
     return;
   }
-
-  const encoded = "aHR0cHM6Ly9zY3JpcHQuZ29vZ2xlLmNvbS9tYWNyb3Mvcy9BS2Z5Y2J5MHhHalV2NUxBcmVPUDBMTWVqbWVrRVJ6TXExUXhCclJVYmc0dGYyUXZPRE9zMUdIVVltRV9jMjFaeGR1N0Z1NlQvZXhlYw==";
-const baseURL = atob(encoded);
-function decodeToken(encoded) {
-  return atob(encoded);
-}
-
-const _x = "TmluSjBrYSQ4OV9"; // هذا هو Base64 لجزء من التوكن
-const _y = "hV3FUQEx6Lk0hcm"; // جزء آخر
-const _z = "VQMzZjOXkqS3U="; // جزء ثالث
-
-const token = decodeToken(_x + _y + _z); // إعادة فك التوكن
-
 // ثم استخدمه هكذا
 // ⚙️ توليد توقيع SHA-256
 async function generateSignature(str) {
@@ -47,7 +34,7 @@ async function fetchMatches(day) {
   const ts = Math.floor(Date.now() / 1000);
   const sig = await generateSignature(`${ts}:${SECRET}`);
 
-  const proxyUrl = `https://joka.abdallah-hussein193193.workers.dev/?ts=${ts}&sig=${sig}&date=${encodeURIComponent(day)}`;
+  const proxyUrl = `https://joka.ninjoka.workers.dev/?ts=${ts}&sig=${sig}&date=${encodeURIComponent(day)}`;
 
   const res = await fetch(proxyUrl, {
     headers: {
