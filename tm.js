@@ -214,12 +214,14 @@ JokaMatch {
   position: relative;
   width: 50px;
   height: 50px;
-  transform: rotate(270deg);
   border-radius: 100%;
   background: #191D2D;
 }
 
 .match-inner-progress-wrap svg circle {
+  stroke-linecap: butt;
+  stroke-dasharray: var(--circumference);
+  stroke-dashoffset: calc(var(--circumference) - (var(--percent, 0) / 100) * var(--circumference));
   width: 100%;
   height: 100%;
   fill: none;
@@ -574,6 +576,7 @@ div.style.setProperty('--progress-color', theme === "dark" ? '#39DBBF' : '#007ac
       div.style.setProperty('--text', theme === "dark" ? '#BFC3D4' : '#222');
 const linksAttr = div.getAttribute("link") || "";
 const linksArray = linksAttr.split(",").map(l => l.trim());
+let globalMatchIndex = 0;
       try {
         const matches = await fetchMatches(day);
         if (flt === "1") {
@@ -583,7 +586,6 @@ const linksArray = linksAttr.split(",").map(l => l.trim());
             if (!grouped[cup]) grouped[cup] = [];
             grouped[cup].push(match);
           });
-let globalMatchIndex = 0;
           const html = Object.entries(grouped).map(([cup, list]) => {
             let matchIndex = 0; // نعد المباريات
 
@@ -644,29 +646,43 @@ globalMatchIndex++;
     });
   });
 })();
+const r = 25;
+const circumference = 2 * Math.PI * r;
+
 setInterval(() => {
-document.querySelectorAll(".match-inner-progress-wrap").forEach(wrapper => {
-const timeEl = wrapper.querySelector(".number");
-const percentEl = wrapper.querySelector(".percent");
-const base = parseInt(wrapper.dataset.base || "0");
-const extra = parseInt(wrapper.dataset.extra || "0");
-const showExtra = wrapper.dataset.showExtra === "true";
-let count = base;
-let seconds = parseInt(wrapper.dataset.seconds || "0");
+  document.querySelectorAll(".match-inner-progress-wrap").forEach(wrapper => {
+    const timeEl = wrapper.querySelector(".number");
+    const percentEl = wrapper.querySelector(".percent");
+    const base = parseInt(wrapper.dataset.base || "0");
+    const extra = parseInt(wrapper.dataset.extra || "0");
+    const showExtra = wrapper.dataset.showExtra === "true";
 
-seconds = (seconds + 1) % 60;
-if (seconds === 0) count++;
+    let count = base;
+    let seconds = parseInt(wrapper.dataset.seconds || "0");
 
-wrapper.dataset.seconds = seconds;
+    seconds = (seconds + 1) % 60;
+    if (seconds === 0) count++;
 
-const secStr = String(seconds).padStart(2, '0');
-if (timeEl) timeEl.textContent = `${count}:${secStr}`;
-if (percentEl) percentEl.style.setProperty('--num', Math.min(100, (count / 90) * 100));
+    wrapper.dataset.seconds = seconds;
 
-const extraEl = wrapper.querySelector(".extra-count");
-if (extraEl && showExtra) {
-  const liveExtra = count - base;
-  extraEl.textContent = `${liveExtra}:${secStr}`;
-}
-});
+    const secStr = String(seconds).padStart(2, '0');
+
+    const percent = Math.min(100, (count / 90) * 100);
+
+    // تحديث المتغيرات الخاصة بـ CSS
+    percentEl.style.setProperty('--circumference', `${circumference}`);
+    percentEl.style.setProperty('--percent', percent);
+    percentEl.style.setProperty('--num', percent);
+
+    // عرض الوقت
+    if (timeEl) timeEl.textContent = `${count}:${secStr}`;
+
+    // الوقت الإضافي
+    const extraEl = wrapper.querySelector(".extra-count");
+    if (extraEl && showExtra) {
+      const liveExtra = count - base;
+      extraEl.textContent = `${liveExtra}:${secStr}`;
+    }
+  });
 }, 1000);
+
