@@ -711,10 +711,13 @@ globalMatchIndex++;
         };
 
         div.innerHTML = `
-          ${renderSection("جارية الآن", live)}
-          ${renderSection("المباريات القادمة", upcoming)}
-          ${renderSection("مباريات انتهت", ended)}
-        `;
+  ${renderSection("جارية الآن", sortByTime(live))}
+  ${renderSection("تبدأ خلال ساعة", sortByTime(soon))}
+  ${renderSection("لاحقًا", sortByTime(future))}
+  ${renderSection("مؤجلة", sortByTime(postponed))}
+  ${renderSection("مباريات انتهت", sortByTime(ended))}
+`;
+
       } catch (e) {
         div.innerHTML = "<p style='color:red'>⚠️ حدث خطأ أثناء تحميل البيانات</p>";
         console.error(e);
