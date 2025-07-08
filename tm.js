@@ -665,7 +665,7 @@ globalMatchIndex++;
     });
   });
 })();
-const r = 25;
+const r = 35;
 const circumference = 2 * Math.PI * r;
 
 setInterval(() => {
