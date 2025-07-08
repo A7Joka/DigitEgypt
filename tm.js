@@ -230,7 +230,7 @@ JokaMatch {
 }
 
 .match-inner-progress-wrap svg {
-  transform: rotate(-90deg);
+  transform: rotate(270deg);
   position: relative;
   width: 50px;
   height: 50px;
@@ -512,7 +512,7 @@ return `
 <div class="first-team-result team-result ${rightClass}">${rightGoals}</div>
   <div class="active-match-progress">
     <span class="result-status-text">${matchLabelt}</span>
-    <div class="match-inner-progress-wrap" id="progress-wrap-${matchId}" data-base="${baseMinute}" data-extra="${extraTime}" data-show-extra="${showExtra}">
+    <div class="match-inner-progress-wrap" id="progress-wrap-${matchId}" data-base="${baseMinute}" data-extra="${extraTime}" data-show-extra="${showExtra}" data-is-rest="${isRest}" data-time-now="${rawMinute}" data-extra-time="0" >
       <span class="result-status-text live-match-status">${matchLabelb}</span>
       <div class="percent" id="percent-${matchId}" style="--num:${percent}">
         <svg>
@@ -673,36 +673,57 @@ setInterval(() => {
   document.querySelectorAll(".match-inner-progress-wrap").forEach(wrapper => {
     const timeEl = wrapper.querySelector(".number");
     const percentEl = wrapper.querySelector(".percent");
-    const base = parseInt(wrapper.dataset.base || "0");
-    const extra = parseInt(wrapper.dataset.extra || "0");
+    const extraEl = wrapper.querySelector(".extra-count");
+
+    const base = parseInt(wrapper.dataset.base || "0"); // 45 أو 90
     const showExtra = wrapper.dataset.showExtra === "true";
+    const isSecondHalf = base >= 90;
+    const isFirstHalf = base >= 45 && base < 90;
 
-    let count = base;
     let seconds = parseInt(wrapper.dataset.seconds || "0");
-
     seconds = (seconds + 1) % 60;
-    if (seconds === 0) count++;
 
     wrapper.dataset.seconds = seconds;
-
     const secStr = String(seconds).padStart(2, '0');
 
-    const percent = Math.min(100, (count / 90) * 100);
+    // ⏱️ الوقت الإضافي
+    let currentMinute;
+    if (showExtra) {
+      // لما ندخل وقت إضافي، العد يبدأ من 00:00
+      let extraMinutes = parseInt(wrapper.dataset.extraTime || "0");
+      if (seconds === 0) extraMinutes++;
+      wrapper.dataset.extraTime = extraMinutes;
 
-    // تحديث المتغيرات الخاصة بـ CSS
+      // ⏱️ تحديث الوقت المعروض
+      if (extraEl) extraEl.textContent = `${extraMinutes}:${secStr}`;
+      if (timeEl) timeEl.textContent = `${base}:00`; // سبّت الوقت عند نهاية الشوط
+
+      currentMinute = base + extraMinutes; // لحساب النسبة
+    } else {
+      let current = base;
+      if (seconds === 0) current++;
+      currentMinute = current;
+
+      if (timeEl) timeEl.textContent = `${current}:${secStr}`;
+    }
+
+    // ✅ حساب النسبة بحسب نوع الشوط
+        // ✅ تحديد maxTime بحسب نوع المباراة
+    let maxTime = 90;
+
+    if (base >= 105) {
+      maxTime = 120; // شوط إضافي ثاني
+    } else if (base >= 90 && showExtra) {
+      maxTime = 120; // شوط إضافي أول
+    } else {
+      maxTime = 90; // الوقت الرسمي للمباراة
+    }
+
+    const percent = Math.min(100, (currentMinute / maxTime) * 100);
+
+    // ⭕ تحديث الدائرة
     percentEl.style.setProperty('--circumference', `${circumference}`);
     percentEl.style.setProperty('--percent', percent);
     percentEl.style.setProperty('--num', percent);
-
-    // عرض الوقت
-    if (timeEl) timeEl.textContent = `${count}:${secStr}`;
-
-    // الوقت الإضافي
-    const extraEl = wrapper.querySelector(".extra-count");
-    if (extraEl && showExtra) {
-      const liveExtra = count - base;
-      extraEl.textContent = `${liveExtra}:${secStr}`;
-    }
   });
 }, 1000);
-
