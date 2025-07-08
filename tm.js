@@ -622,7 +622,40 @@ let globalMatchIndex = 0;
               else future.push(match);
             });
 
-            const sorted = [...live, ...soon, ...future, ...ended];
+            const sortByTime = list =>
+  list.sort((a, b) => new Date(a["Time-Start"]) - new Date(b["Time-Start"]));
+
+const live = [], soon = [], future = [], ended = [];
+
+list.forEach(match => {
+  const status = match["Match-Status"];
+  const start = new Date(match["Time-Start"]);
+  const now = new Date();
+  const diffMin = Math.floor((start - now) / 60000);
+
+  if (status.includes("انتهت")) {
+    ended.push(match);
+  } else if (status.includes("جارية") || status.includes("شوط")) {
+    live.push(match);
+  } else if (status.includes("تأجلت") || status.includes("مؤجلة")) {
+    future.push(match); // مؤجلة نعتبرها مستقبلية
+  } else if (diffMin <= 60 && diffMin > 0) {
+    soon.push(match);
+  } else if (diffMin > 60) {
+    future.push(match);
+  } else {
+    future.push(match); // أي حالة غريبة تروح في المستقبلية
+  }
+});
+
+// ✅ ترتيب زمني داخل كل حالة
+const sorted = [
+  ...sortByTime(live),
+  ...sortByTime(soon),
+  ...sortByTime(future),
+  ...sortByTime(ended)
+];
+
             const section = sorted.map((match, index) => {
 const link = linksArray[globalMatchIndex] || "#";
               globalMatchIndex++;
@@ -636,7 +669,30 @@ const link = linksArray[globalMatchIndex] || "#";
           return;
         }
 
-        const live = [], upcoming = [], ended = [];
+const live = [], soon = [], future = [], ended = [], postponed = [];
+
+const now = new Date();
+
+matches.forEach(match => {
+  const status = match["Match-Status"];
+  const start = new Date(match["Time-Start"]);
+  const diffMin = Math.floor((start - now) / 60000);
+
+  if (status.includes("انتهت") || status.includes("إنتهت")) {
+    ended.push(match);
+  } else if (status.includes("جارية") || status.includes("شوط")) {
+    live.push(match);
+  } else if (status.includes("تأجلت") || status.includes("مؤجلة")) {
+    postponed.push(match);
+  } else if (diffMin <= 60 && diffMin > 0) {
+    soon.push(match);
+  } else {
+    future.push(match);
+  }
+});
+
+const sortByTime = list =>
+  list.sort((a, b) => new Date(a["Time-Start"]) - new Date(b["Time-Start"]));
         matches.forEach(match => {
           const status = match["Match-Status"];
           if (status.includes("جارية") || status.includes("شوط")) live.push(match);
