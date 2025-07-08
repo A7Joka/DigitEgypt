@@ -230,6 +230,7 @@ JokaMatch {
 }
 
 .match-inner-progress-wrap svg {
+  transform: rotate(-90deg);
   position: relative;
   width: 50px;
   height: 50px;
@@ -665,7 +666,7 @@ globalMatchIndex++;
     });
   });
 })();
-const r = 35;
+const r = 25;
 const circumference = 2 * Math.PI * r;
 
 setInterval(() => {
