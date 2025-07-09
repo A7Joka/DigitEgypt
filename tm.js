@@ -20,6 +20,11 @@
   }
   const apiKey = document.currentScript.getAttribute("api-key");
   function checkJokaMatchStructure() {
+  const jokaContainers = document.querySelectorAll("JokaMatch");
+  if (!jokaContainers.length) {
+    displayStructureError("❌ لم يتم العثور على وسم <JokaMatch>. الرجاء تضمين الكود بالشكل الصحيح لتعمل الإضافة.");
+    throw new Error("Missing <JokaMatch> element");
+  }
   const containers = document.querySelectorAll("JokaMatch");
 
   containers.forEach(container => {
@@ -41,7 +46,6 @@ function displayStructureError(msg) {
     </div>
   `;
 }
-  checkJokaMatchStructure();
 
 // 🎯 جلب Blog ID من JSON feed فقط
 async function getBlogIdFromJsonFeed(blogUrl) {
@@ -109,6 +113,8 @@ function displayAccessError(msg, isKeyError = false, blogId = "") {
   const authorized = await checkAuthorization(apiKey);
   if (!authorized) return;
 // ثم استخدمه هكذا
+  checkJokaMatchStructure();
+
 // ⚙️ توليد توقيع SHA-256
 async function generateSignature(str) {
   const buffer = new TextEncoder().encode(str);
