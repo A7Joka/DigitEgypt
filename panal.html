@@ -110,19 +110,22 @@ async function fetchMatches(day) {
 
   const proxyUrl = `https://joka.ninjoka.workers.dev/?ts=${ts}&sig=${sig}&date=${encodeURIComponent(day)}`;
 
-  const res = await fetch(proxyUrl, {
-    headers: {
-      "X-From-Joka": "YES"
-    }
-  });
+  try {
+    const res = await fetch(proxyUrl, {
+      headers: {
+        "X-From-Joka": "YES"
+      }
+    });
 
-  const rawText = await res.text();
-  const json = JSON.parse(rawText.replace(/^NinJoka\((.*)\)$/, "$1"));
-if (!json.matches || !Array.isArray(json.matches)) {
-            throw new Error("❌ لا توجد مباريات");
-          }
-          renderMatches(json.matches);
-}  catch (e) {
+    const rawText = await res.text();
+    const json = JSON.parse(rawText.replace(/^NinJoka\((.*)\)$/, "$1"));
+
+    if (!json.matches || !Array.isArray(json.matches)) {
+      throw new Error("❌ لا توجد مباريات");
+    }
+
+    renderMatches(json.matches);
+  } catch (e) {
     alert("⚠️ حدث خطأ أثناء جلب المباريات");
     console.error(e);
   }
