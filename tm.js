@@ -675,37 +675,62 @@ setInterval(() => {
     const percentEl = wrapper.querySelector(".percent");
     const extraEl = wrapper.querySelector(".extra-count");
 
-    const base = parseInt(wrapper.dataset.base || "0");
-    const showExtra = wrapper.dataset.showExtra === "true";
-    const isRest = wrapper.dataset.isRest === "true";
+    // خصائص البيانات
+    let base = parseInt(wrapper.dataset.base || "0");        // الدقيقة الثابتة (مثلاً 45)
+    let extra = parseInt(wrapper.dataset.extraTime || "0");   // عدد دقائق الوقت الإضافي
+    let seconds = parseInt(wrapper.dataset.seconds || "0");   // عداد الثواني
+    const showExtra = wrapper.dataset.showExtra === "true";   // هل احنا في وقت إضافي
+    const isRest = wrapper.dataset.isRest === "true";         // هل احنا في استراحة
 
-    if (isRest) return; // 💤 استراحة، لا نعد شيئًا
+    // ⏸️ لو استراحة، نوقف العد تمامًا
+    if (isRest) return;
 
-    let seconds = parseInt(wrapper.dataset.seconds || "0");
-    seconds = (seconds + 1) % 60;
+    // 🕒 تحديث الثواني
+    seconds++;
+    if (seconds >= 60) {
+      seconds = 0;
+
+      if (showExtra) {
+        extra++;
+        wrapper.dataset.extraTime = extra;
+      } else {
+        base++;
+        wrapper.dataset.base = base;
+      }
+    }
+
+    // 📝 تحديث الـ dataset
     wrapper.dataset.seconds = seconds;
 
     const secStr = String(seconds).padStart(2, '0');
 
-    // ⏱️ نبدأ بالوقت الإضافي
+    // 🧮 عرض الوقت
     if (showExtra) {
-      let extraMinutes = parseInt(wrapper.dataset.extraTime || "0");
-
-      if (seconds === 0) extraMinutes++;
-      wrapper.dataset.extraTime = extraMinutes;
-
-      // ✅ تحديث الوقت الإضافي فقط
-      if (extraEl) extraEl.textContent = `${extraMinutes}:${secStr}`;
-      if (timeEl) timeEl.textContent = `${base}:00`; // ثابت
-
-      // 🧮 تحديث الدائرة
-      const currentMinute = base + extraMinutes;
-      let maxTime = base === 45 ? 60 : 120; // تقدر تخصصلها لو عاوز
-      const percent = Math.min(100, (currentMinute / maxTime) * 100);
-      percentEl.style.setProperty('--circumference', `${circumference}`);
-      percentEl.style.setProperty('--percent', percent);
-      percentEl.style.setProperty('--num', percent);
+      // الثواني الإضافية
+      if (extraEl) extraEl.textContent = `${extra}:${secStr}`;
+      if (timeEl) timeEl.textContent = `${base}:00`;
+    } else {
+      if (timeEl) timeEl.textContent = `${base}:${secStr}`;
     }
+
+    // ⭕ حساب النسبة المئوية لتقدم المباراة
+    let currentMinute = base + (showExtra ? extra : 0);
+    let maxTime = 90;
+
+    if (base === 45 && showExtra) maxTime = 60;
+    else if (base === 90 && showExtra) maxTime = 120;
+    else if (base === 105 && showExtra) maxTime = 110;
+    else if (base === 120 && showExtra) maxTime = 130;
+    else if (base === 45) maxTime = 45;
+    else if (base === 90) maxTime = 90;
+    else if (base === 105) maxTime = 105;
+    else if (base === 120) maxTime = 120;
+
+    const percent = Math.min(100, (currentMinute / maxTime) * 100);
+
+    // 🟢 تحديث الدائرة
+    percentEl.style.setProperty('--circumference', `${circumference}`);
+    percentEl.style.setProperty('--percent', percent);
+    percentEl.style.setProperty('--num', percent);
   });
 }, 1000);
-
