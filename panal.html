@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <title>مولد كود JokaMatch</title>
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: #151825;
+      color: #fff;
+      padding: 30px;
+      direction: rtl;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+    }
+    input, textarea, button {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      font-family: inherit;
+      border: none;
+    }
+    input, textarea {
+      background: #1e2133;
+      color: #fff;
+    }
+    button {
+      background: #39DBBF;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .hidden {
+      display: none;
+    }
+    .match-row {
+      background: #1e2133;
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .match-row input[type="text"] {
+      flex: 1;
+    }
+    .code-output {
+      background: #1e2133;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 14px;
+      direction: ltr;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🎯 مولد كود JokaMatch</h2>
+    
+    <div id="login-area">
+      <input type="password" id="password" placeholder="ادخل كلمة المرور">
+      <button onclick="login()">تسجيل الدخول</button>
+    </div>
+
+    <div id="generator-area" class="hidden">
+      <input type="text" id="apiKeyInput" placeholder="ادخل كود API Key">
+      <button onclick="verifyKey()">تحقق من الكود</button>
+
+      <div id="matches-area" class="hidden">
+        <h3>✅ حدد المباريات وضع الروابط:</h3>
+        <div id="match-list"></div>
+        <button onclick="generateCode()">🎉 توليد الكود</button>
+        <textarea id="finalCode" class="code-output" rows="5" readonly></textarea>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const PASSWORD = "joka2025"; // ✳️ غيّرها كل فترة
+
+    function login() {
+      const pass = document.getElementById("password").value;
+      if (pass === PASSWORD) {
+        document.getElementById("login-area").classList.add("hidden");
+        document.getElementById("generator-area").classList.remove("hidden");
+      } else {
+        alert("❌ كلمة المرور غير صحيحة");
+      }
+    }
+
+    function verifyKey() {
+      const key = document.getElementById("apiKeyInput").value.trim();
+      if (!key) return alert("⚠️ أدخل كود صحيح");
+
+      fetch(`https://joka.ninjoka.workers.dev/?ts=${Math.floor(Date.now()/1000)}&sig=xxx&date=today`)
+        .then(res => res.text())
+        .then(txt => {
+          const json = JSON.parse(txt.replace(/^NinJoka\((.*)\)$/, '$1'));
+          if (!json.matches || !Array.isArray(json.matches)) {
+            throw new Error("❌ لا توجد مباريات");
+          }
+          renderMatches(json.matches);
+        })
+        .catch(e => {
+          alert("⚠️ خطأ أثناء جلب المباريات");
+          console.error(e);
+        });
+    }
+
+    function renderMatches(matches) {
+      const list = document.getElementById("match-list");
+      list.innerHTML = "";
+      document.getElementById("matches-area").classList.remove("hidden");
+
+      matches.forEach(match => {
+        const matchId = match["Match-id"];
+        const title = `${match["Team-Right"].Name} × ${match["Team-Left"].Name}`;
+
+        const row = document.createElement("div");
+        row.className = "match-row";
+        row.innerHTML = `
+          <input type="checkbox" id="chk-${matchId}" onchange="toggleLinkInput('${matchId}')">
+          <label for="chk-${matchId}">${title}</label>
+          <input type="text" id="link-${matchId}" placeholder="رابط المباراة" class="hidden">
+        `;
+        list.appendChild(row);
+      });
+    }
+
+    function toggleLinkInput(id) {
+      const input = document.getElementById(`link-${id}`);
+      input.classList.toggle("hidden");
+    }
+
+    function generateCode() {
+      const map = {};
+      const checkboxes = document.querySelectorAll("input[type='checkbox']");
+
+      checkboxes.forEach(chk => {
+        const id = chk.id.replace("chk-", "");
+        if (chk.checked) {
+          const val = document.getElementById(`link-${id}`).value.trim();
+          map[id] = val || "#";
+        } else {
+          map[id] = "--hide--";
+        }
+      });
+
+      const json = JSON.stringify(map);
+      const encoded = btoa(json);
+      const apiKey = document.getElementById("apiKeyInput").value.trim();
+
+      const final = `
+<JokaMatch>
+  <div day="today" theme="dark" flt="1" data-links="${encoded}" style="display:block;text-align:center;"></div>
+</JokaMatch>
+<script src="https://eng3body0.github.io/DigitEgypt/tm.js" api-key="${apiKey}"></script>
+      `.trim();
+
+      document.getElementById("finalCode").value = final;
+    }
+  </script>
+</body>
+</html>
