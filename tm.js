@@ -19,8 +19,10 @@
     }
   }
   const apiKey = document.currentScript.getAttribute("api-key");
-  const containers = document.querySelectorAll("JokaMatch");
-  async function getBlogIdFromJsonFeed(blogUrl) {
+const containers = document.querySelectorAll("JokaMatch");
+
+// 🎯 جلب Blog ID من JSON feed فقط
+async function getBlogIdFromJsonFeed(blogUrl) {
   try {
     const res = await fetch(`${blogUrl}/feeds/posts/default/?max-results=0&alt=json`);
     const json = await res.json();
@@ -28,51 +30,62 @@
     const blogId = fullId.match(/blog-(\d+)/)?.[1];
     return blogId;
   } catch (e) {
-    console.error("⚠️ فشل في جلب Blog ID من JSON");
+    console.error("⚠️ فشل في جلب Blog ID من JSON", e);
     return null;
   }
 }
 
+// 🗝️ المفاتيح المفعّلة
 const allowedKeys = {
-  "ABC123XYZ": "2325258222068455523"
+  "ABC123XYZ": "2325258222068455523", // مثال
 };
 
+// ✅ تحقق الصلاحية
 async function checkAuthorization(apiKey) {
-const currentBlogId = await getBlogIdFromJsonFeed(location.origin);
-if (!currentBlogId) {
-displayAccessError("⚠️ تعذر جلب بيانات المدونة");
-return false;
+  const currentBlogId = await getBlogIdFromJsonFeed(location.origin);
+  if (!currentBlogId) {
+    displayAccessError("⚠️ تعذر جلب معرف المدونة من JSON. تأكد من صحة الرابط أو إعدادات المدونة.");
+    return false;
+  }
+
+  const matchingKey = Object.entries(allowedKeys).find(([key, id]) => id === currentBlogId);
+
+  if (!matchingKey) {
+    displayAccessError(`🚫 هذه المدونة (${currentBlogId}) غير مفعلة لاستخدام الإضافة.`, false, currentBlogId);
+    return false;
+  }
+
+  if (matchingKey[0] !== apiKey) {
+    displayAccessError(`🚫 مفتاح الدخول غير صحيح لهذه المدونة (${currentBlogId}).`, true, currentBlogId);
+    return false;
+  }
+
+  return true;
 }
 
-// تحقق: هل هذا الـ blogId مفعّل أصلاً؟
-const matchingKey = Object.entries(allowedKeys).find(([key, id]) => id === currentBlogId);
-
-if (!matchingKey) {
-displayAccessError("🚫 هذه المدونة (${currentBlogId}) غير مفعلة لاستخدام الإضافة., false, currentBlogId");
-return false;
-}
-
-// تحقق من الـ apiKey
-if (matchingKey[0] !== apiKey) {
-displayAccessError("🚫 مفتاح الدخول غير صحيح لهذه المدونة (${currentBlogId})., true, currentBlogId");
-return false;
-}
-
-// ✅ كل شيء تمام
-return true;
-}
+// ❌ عرض رسالة منع الوصول
 function displayAccessError(msg, isKeyError = false, blogId = "") {
-const encodedBlogId = encodeURIComponent(blogId);
-const whatsappMsg = isKeyError
-? `مرحبًا، أواجه مشكلة في مفتاح الدخول الخاص بإضافة جوكا للمباريات.%0Aمدونة: ${encodedBlogId}`
-: `مرحبًا، أواجه مشكلة في تفعيل إضافة جوكا للمباريات على مدونتي.%0Aمدونة: ${encodedBlogId}`;
+  const encodedBlogId = encodeURIComponent(blogId || "غير معروف");
+  const whatsappMsg = isKeyError
+    ? `مرحبًا، أواجه مشكلة في مفتاح الدخول الخاص بإضافة جوكا للمباريات.%0Aمدونة: ${encodedBlogId}`
+    : `مرحبًا، أواجه مشكلة في تفعيل إضافة جوكا للمباريات على مدونتي.%0Aمدونة: ${encodedBlogId}`;
 
-document.body.innerHTML = `<div style="font-family:'Cairo',sans-serif;text-align:center;padding:50px;color:#fff;background:#1b1d2a;min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;"> <h2 style="color:#FF3131">⛔ صلاحية مرفوضة</h2> <p style="font-size:16px;margin:10px 0 20px;">${msg}</p> <a href="https://wa.me/201021312224?text=${whatsappMsg}" target="_blank" style="background:#25D366;padding:10px 20px;border-radius:8px;color:#fff;text-decoration:none;font-weight:bold;"> 💬 تواصل مع الدعم عبر واتساب </a> </div>` ;
-throw new Error("Unauthorized Access");
+  document.body.innerHTML = `
+    <div style="font-family:'Cairo',sans-serif;text-align:center;padding:50px;color:#fff;background:#1b1d2a;min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;">
+      <h2 style="color:#FF3131">⛔ صلاحية مرفوضة</h2>
+      <p style="font-size:16px;margin:10px 0 20px;">${msg}</p>
+      <a href="https://wa.me/201021312224?text=${whatsappMsg}" target="_blank" style="background:#25D366;padding:10px 20px;border-radius:8px;color:#fff;text-decoration:none;font-weight:bold;">
+        💬 تواصل مع الدعم عبر واتساب
+      </a>
+    </div>
+  `;
+  throw new Error("⛔ تم إيقاف تنفيذ السكربت بسبب صلاحية غير صحيحة");
 }
 
-
-
+// 🚀 شغل التحقق قبل أي تنفيذ
+(async () => {
+  const authorized = await checkAuthorization(apiKey);
+  if (!authorized) return;
 // ثم استخدمه هكذا
 // ⚙️ توليد توقيع SHA-256
 async function generateSignature(str) {
@@ -709,6 +722,8 @@ globalMatchIndex++;
     });
   });
 })();
+})();
+
 const r = 25;
 const circumference = 2 * Math.PI * r;
 
