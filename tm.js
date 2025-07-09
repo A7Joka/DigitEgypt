@@ -20,25 +20,56 @@
   }
   const apiKey = document.currentScript.getAttribute("api-key");
   const containers = document.querySelectorAll("JokaMatch");
-
-  const allowedKeys = {
-    "ABC123XYZ": "2325258222068455523"
-  };
-
-  let currentBlogId = null;
+  async function getBlogIdFromJsonFeed(blogUrl) {
   try {
-    if (window._WidgetManager && typeof _WidgetManager._GetAllData === "function") {
-      currentBlogId = _WidgetManager._GetAllData().blog.blogId;
-    }
-  } catch (e) {}
+    const res = await fetch(`${blogUrl}/feeds/posts/default/?max-results=0&alt=json`);
+    const json = await res.json();
+    const fullId = json.feed.id.$t;
+    const blogId = fullId.match(/blog-(\d+)/)?.[1];
+    return blogId;
+  } catch (e) {
+    console.error("⚠️ فشل في جلب Blog ID من JSON");
+    return null;
+  }
+}
+
+const allowedKeys = {
+  "ABC123XYZ": "2325258222068455523"
+};
+
+async function checkAuthorization(apiKey) {
+  const currentBlogId = await getBlogIdFromJsonFeed(location.origin);
   if (!currentBlogId) {
-    const meta = document.querySelector('meta[name="joka-blog-id"]');
-    currentBlogId = meta?.getAttribute("content") || null;
+    displayAccessError("تعذر جلب بيانات المدونة");
+    return false;
   }
-  if (!currentBlogId || allowedKeys[apiKey] !== currentBlogId) {
-    console.error("\uD83D\uDEAB Unauthorized Access");
-    return;
+
+  const expectedId = allowedKeys[apiKey];
+  if (!expectedId) {
+    displayAccessError("🚫 مفتاح الدخول غير صحيح. تأكد من إدخال الكود الصحيح.", true);
+    return false;
   }
+
+  if (expectedId !== currentBlogId) {
+    displayAccessError("🚫 هذه المدونة غير مصرح لها باستخدام الإضافة. يرجى التواصل معنا لتفعيلها.");
+    return false;
+  }
+
+  return true;
+}
+  function displayAccessError(msg, isKeyError = false) {
+  document.body.innerHTML = `
+    <div style="font-family:'Cairo',sans-serif;text-align:center;padding:50px;color:#fff;background:#1b1d2a;min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;">
+      <h2 style="color:#FF3131">⛔ صلاحية مرفوضة</h2>
+      <p style="font-size:16px;margin:10px 0 20px;">${msg}</p>
+      <a href="https://wa.me/201021312224?text=مرحبًا، أواجه مشكلة في استخدام إضافة جوكا للمباريات.${isKeyError ? '%0Aالخطأ في مفتاح الدخول' : '%0Aالمدونة غير مفعلة'}" target="_blank" style="background:#25D366;padding:10px 20px;border-radius:8px;color:#fff;text-decoration:none;font-weight:bold;">
+        💬 تواصل مع الدعم عبر واتساب
+      </a>
+    </div>
+  `;
+  throw new Error("Unauthorized Access");
+}
+
 // ثم استخدمه هكذا
 // ⚙️ توليد توقيع SHA-256
 async function generateSignature(str) {
