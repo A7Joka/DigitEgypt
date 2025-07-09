@@ -19,33 +19,51 @@
     }
   }
   const apiKey = document.currentScript.getAttribute("api-key");
-  function checkJokaMatchStructure() {
+function checkJokaMatchStructure() {
   const jokaContainers = document.querySelectorAll("JokaMatch");
+
   if (!jokaContainers.length) {
-    displayStructureError("❌ لم يتم العثور على وسم <JokaMatch>. الرجاء تضمين الكود بالشكل الصحيح لتعمل الإضافة.");
+    // الحالة الأولى: الوسم JokaMatch غير موجود بالكامل
+    displayStructureError(
+      "⚠️ لم يتم تفعيل الإضافة بالشكل الصحيح. الرجاء التأكد من تركيب الكود كما هو دون تعديل.",
+      "missing-joka"
+    );
     throw new Error("Missing <JokaMatch> element");
   }
-  const containers = document.querySelectorAll("JokaMatch");
 
-  containers.forEach(container => {
+  let foundInvalid = false;
+  jokaContainers.forEach(container => {
     const hasValidDiv = container.querySelector("div[day]");
     if (!hasValidDiv) {
-      displayStructureError("❌ تم تعديل بنية الوسم <JokaMatch> أو حذف الخصائص الأساسية. الرجاء عدم تعديل كود الإضافة.");
-      throw new Error("Invalid <JokaMatch> structure");
+      foundInvalid = true;
     }
   });
+
+  if (foundInvalid) {
+    // الحالة الثانية: تم حذف div[day] من داخل JokaMatch
+    displayStructureError(
+      "⚠️ حدث خلل في تفعيل الإضافة. تأكد من عدم حذف أو تعديل أي جزء من كود الإضافة.",
+      "broken-structure"
+    );
+    throw new Error("Invalid <JokaMatch> structure");
+  }
 }
-function displayStructureError(msg) {
+
+function displayStructureError(message, errorCode) {
+  const encodedMessage = encodeURIComponent(`مرحبًا، أواجه مشكلة في تركيب إضافة جوكا. رمز التحقق: ${errorCode}`);
+  const whatsappLink = `https://wa.me/201030588214?text=${encodedMessage}`;
+
   document.body.innerHTML = `
     <div style="font-family:'Cairo',sans-serif;text-align:center;padding:50px;color:#fff;background:#1b1d2a;min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;">
-      <h2 style="color:#FF3131">⚠️ خطأ في الاستخدام</h2>
-      <p style="font-size:16px;margin:10px 0 20px;">${msg}</p>
-      <a href="https://wa.me/201021312224?text=مرحبًا، أواجه مشكلة في استخدام إضافة جوكا وتم التعديل على الوسم JokaMatch" target="_blank" style="background:#25D366;padding:10px 20px;border-radius:8px;color:#fff;text-decoration:none;font-weight:bold;">
+      <h2 style="color:#FF3131">🚫 مشكلة في تفعيل الإضافة</h2>
+      <p style="font-size:16px;margin:10px 0 20px;">${message}</p>
+      <a href="${whatsappLink}" target="_blank" style="background:#25D366;padding:10px 20px;border-radius:8px;color:#fff;text-decoration:none;font-weight:bold;">
         💬 تواصل مع الدعم عبر واتساب
       </a>
     </div>
   `;
 }
+
 
 // 🎯 جلب Blog ID من JSON feed فقط
 async function getBlogIdFromJsonFeed(blogUrl) {
@@ -100,7 +118,7 @@ function displayAccessError(msg, isKeyError = false, blogId = "") {
     <div style="font-family:'Cairo',sans-serif;text-align:center;padding:50px;color:#fff;background:#1b1d2a;min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;">
       <h2 style="color:#FF3131">⛔ صلاحية مرفوضة</h2>
       <p style="font-size:16px;margin:10px 0 20px;">${msg}</p>
-      <a href="https://wa.me/201021312224?text=${whatsappMsg}" target="_blank" style="background:#25D366;padding:10px 20px;border-radius:8px;color:#fff;text-decoration:none;font-weight:bold;">
+      <a href="https://wa.me/201030588214?text=${whatsappMsg}" target="_blank" style="background:#25D366;padding:10px 20px;border-radius:8px;color:#fff;text-decoration:none;font-weight:bold;">
         💬 تواصل مع الدعم عبر واتساب
       </a>
     </div>
