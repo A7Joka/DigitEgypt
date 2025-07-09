@@ -726,7 +726,7 @@ setInterval(() => {
     else if (base === 105) maxTime = 105;
     else if (base === 120) maxTime = 120;
 
-    const percent = Math.min(100, (currentMinute * 1.11111));
+    const percent = Math.min(100, (currentMinute * 0.9));
 
     // 🟢 تحديث الدائرة
     percentEl.style.setProperty('--circumference', `${circumference}`);
