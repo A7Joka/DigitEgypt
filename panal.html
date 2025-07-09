@@ -62,126 +62,119 @@
     
     <div id="login-area">
       <input type="password" id="password" placeholder="ادخل كلمة المرور">
-      <button onclick="login()">تسجيل الدخول</button>
+      <button id="login-btn">تسجيل الدخول</button>
     </div>
 
     <div id="generator-area" class="hidden">
       <input type="text" id="apiKeyInput" placeholder="ادخل كود API Key">
-      <button onclick="verifyKey()">تحقق من الكود</button>
+      <button id="verify-btn">تحقق من الكود</button>
 
       <div id="matches-area" class="hidden">
         <h3>✅ حدد المباريات وضع الروابط:</h3>
         <div id="match-list"></div>
-        <button onclick="generateCode()">🎉 توليد الكود</button>
+        <button id="generate-btn">🎉 توليد الكود</button>
         <textarea id="finalCode" class="code-output" rows="5" readonly></textarea>
       </div>
     </div>
   </div>
 
   <script>
-    const PASSWORD = "joka2025"; // ✳️ غيّرها كل فترة
+    document.addEventListener("DOMContentLoaded", () => {
+      const PASSWORD = "joka2025";
 
-    function login() {
-      const pass = document.getElementById("password").value;
-      if (pass === PASSWORD) {
-        document.getElementById("login-area").classList.add("hidden");
-        document.getElementById("generator-area").classList.remove("hidden");
-      } else {
-        alert("❌ كلمة المرور غير صحيحة");
-      }
-    }
-
-    function verifyKey() {
-      const key = document.getElementById("apiKeyInput").value.trim();
-      if (!key) return alert("⚠️ أدخل كود صحيح");
-      fetchMatches("today");
-}
-    async function generateSignature(str) {
-  const buffer = new TextEncoder().encode(str);
-  const digest = await crypto.subtle.digest("SHA-256", buffer);
-  return [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2, "0")).join("");
-}
-
-// 🔐 تحميل المباريات من البروكسي المؤمَّن
-async function fetchMatches(day) {
-  const SECRET = "NinJ0kaKey";
-  const ts = Math.floor(Date.now() / 1000);
-  const sig = await generateSignature(`${ts}:${SECRET}`);
-
-  const proxyUrl = `https://joka.ninjoka.workers.dev/?ts=${ts}&sig=${sig}&date=${encodeURIComponent(day)}`;
-
-  try {
-    const res = await fetch(proxyUrl, {
-      headers: {
-        "X-From-Joka": "YES"
-      }
-    });
-
-    const rawText = await res.text();
-    const json = JSON.parse(rawText.replace(/^NinJoka\((.*)\)$/, "$1"));
-
-    if (!json.matches || !Array.isArray(json.matches)) {
-      throw new Error("❌ لا توجد مباريات");
-    }
-
-    renderMatches(json.matches);
-  } catch (e) {
-    alert("⚠️ حدث خطأ أثناء جلب المباريات");
-    console.error(e);
-  }
-}
-    function renderMatches(matches) {
-      const list = document.getElementById("match-list");
-      list.innerHTML = "";
-      document.getElementById("matches-area").classList.remove("hidden");
-
-      matches.forEach(match => {
-        const matchId = match["Match-id"];
-        const title = `${match["Team-Right"].Name} × ${match["Team-Left"].Name}`;
-
-        const row = document.createElement("div");
-        row.className = "match-row";
-        row.innerHTML = `
-          <input type="checkbox" id="chk-${matchId}" onchange="toggleLinkInput('${matchId}')">
-          <label for="chk-${matchId}">${title}</label>
-          <input type="text" id="link-${matchId}" placeholder="رابط المباراة" class="hidden">
-        `;
-        list.appendChild(row);
-      });
-    }
-
-    function toggleLinkInput(id) {
-      const input = document.getElementById(`link-${id}`);
-      input.classList.toggle("hidden");
-    }
-
-    function generateCode() {
-      const map = {};
-      const checkboxes = document.querySelectorAll("input[type='checkbox']");
-
-      checkboxes.forEach(chk => {
-        const id = chk.id.replace("chk-", "");
-        if (chk.checked) {
-          const val = document.getElementById(`link-${id}`).value.trim();
-          map[id] = val || "#";
+      document.getElementById("login-btn").addEventListener("click", () => {
+        const pass = document.getElementById("password").value;
+        if (pass === PASSWORD) {
+          document.getElementById("login-area").classList.add("hidden");
+          document.getElementById("generator-area").classList.remove("hidden");
         } else {
-          map[id] = "--hide--";
+          alert("❌ كلمة المرور غير صحيحة");
         }
       });
 
-      const json = JSON.stringify(map);
-      const encoded = btoa(json);
-      const apiKey = document.getElementById("apiKeyInput").value.trim();
+      document.getElementById("verify-btn").addEventListener("click", () => {
+        const key = document.getElementById("apiKeyInput").value.trim();
+        if (!key) return alert("⚠️ أدخل كود صحيح");
+        fetchMatches("today");
+      });
 
-      const final = `
+      document.getElementById("generate-btn").addEventListener("click", () => {
+        const map = {};
+        const checkboxes = document.querySelectorAll("input[type='checkbox']");
+
+        checkboxes.forEach(chk => {
+          const id = chk.id.replace("chk-", "");
+          if (chk.checked) {
+            const val = document.getElementById(`link-${id}`).value.trim();
+            map[id] = val || "#";
+          } else {
+            map[id] = "--hide--";
+          }
+        });
+
+        const json = JSON.stringify(map);
+        const encoded = btoa(json);
+        const apiKey = document.getElementById("apiKeyInput").value.trim();
+
+        const final = `
 <JokaMatch>
   <div day="today" theme="dark" flt="1" data-links="${encoded}" style="display:block;text-align:center;"></div>
 </JokaMatch>
 <script src="https://eng3body0.github.io/DigitEgypt/tm.js" api-key="${apiKey}"></script>
-      `.trim();
+        `;
+        document.getElementById("finalCode").value = final.trim();
+      });
 
-      document.getElementById("finalCode").value = final;
-    }
+      async function generateSignature(str) {
+        const buffer = new TextEncoder().encode(str);
+        const digest = await crypto.subtle.digest("SHA-256", buffer);
+        return [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2, "0")).join("");
+      }
+
+      async function fetchMatches(day) {
+        const SECRET = "NinJ0kaKey";
+        const ts = Math.floor(Date.now() / 1000);
+        const sig = await generateSignature(`${ts}:${SECRET}`);
+        const proxyUrl = `https://joka.ninjoka.workers.dev/?ts=${ts}&sig=${sig}&date=${encodeURIComponent(day)}`;
+
+        try {
+          const res = await fetch(proxyUrl, {
+            headers: {
+              "X-From-Joka": "YES"
+            }
+          });
+          const rawText = await res.text();
+          const json = JSON.parse(rawText.replace(/^NinJoka\((.*)\)$/, "$1"));
+          if (!json.matches || !Array.isArray(json.matches)) {
+            throw new Error("❌ لا توجد مباريات");
+          }
+          renderMatches(json.matches);
+        } catch (e) {
+          alert("⚠️ حدث خطأ أثناء جلب المباريات");
+          console.error(e);
+        }
+      }
+
+      function renderMatches(matches) {
+        const list = document.getElementById("match-list");
+        list.innerHTML = "";
+        document.getElementById("matches-area").classList.remove("hidden");
+
+        matches.forEach(match => {
+          const matchId = match["Match-id"];
+          const title = `${match["Team-Right"].Name} × ${match["Team-Left"].Name}`;
+
+          const row = document.createElement("div");
+          row.className = "match-row";
+          row.innerHTML = `
+            <input type="checkbox" id="chk-${matchId}" onchange="document.getElementById('link-${matchId}').classList.toggle('hidden')">
+            <label for="chk-${matchId}">${title}</label>
+            <input type="text" id="link-${matchId}" placeholder="رابط المباراة" class="hidden">
+          `;
+          list.appendChild(row);
+        });
+      }
+    });
   </script>
 </body>
 </html>
