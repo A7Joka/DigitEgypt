@@ -19,8 +19,28 @@
     }
   }
   const apiKey = document.currentScript.getAttribute("api-key");
-const containers = document.querySelectorAll("JokaMatch");
+  function checkJokaMatchStructure() {
+  const containers = document.querySelectorAll("JokaMatch");
 
+  containers.forEach(container => {
+    const hasValidDiv = container.querySelector("div[day]");
+    if (!hasValidDiv) {
+      displayStructureError("❌ تم تعديل بنية الوسم <JokaMatch> أو حذف الخصائص الأساسية. الرجاء عدم تعديل كود الإضافة.");
+      throw new Error("Invalid <JokaMatch> structure");
+    }
+  });
+}
+function displayStructureError(msg) {
+  document.body.innerHTML = `
+    <div style="font-family:'Cairo',sans-serif;text-align:center;padding:50px;color:#fff;background:#1b1d2a;min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;">
+      <h2 style="color:#FF3131">⚠️ خطأ في الاستخدام</h2>
+      <p style="font-size:16px;margin:10px 0 20px;">${msg}</p>
+      <a href="https://wa.me/201021312224?text=مرحبًا، أواجه مشكلة في استخدام إضافة جوكا وتم التعديل على الوسم JokaMatch" target="_blank" style="background:#25D366;padding:10px 20px;border-radius:8px;color:#fff;text-decoration:none;font-weight:bold;">
+        💬 تواصل مع الدعم عبر واتساب
+      </a>
+    </div>
+  `;
+}
 // 🎯 جلب Blog ID من JSON feed فقط
 async function getBlogIdFromJsonFeed(blogUrl) {
   try {
