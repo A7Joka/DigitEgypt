@@ -512,8 +512,7 @@ return `
 <div class="first-team-result team-result ${rightClass}">${rightGoals}</div>
   <div class="active-match-progress">
     <span class="result-status-text">${matchLabelt}</span>
-    <div class="match-inner-progress-wrap" id="progress-wrap-${matchId}" data-base="${baseMinute}" data-extra-time="0" data-extra="${extraTime}" data-show-extra="${showExtra}" data-is-rest="${isRest}" data-time-now="${rawMinute}" 
->
+    <div class="match-inner-progress-wrap" id="progress-wrap-${matchId}" data-base="${baseMinute}" data-show-extra="${showExtra}" data-extra-time="${extraTime}" data-is-rest="${isRest}" data-seconds="0"  >
       <span class="result-status-text live-match-status">${matchLabelb}</span>
       <div class="percent" id="percent-${matchId}" style="--num:${percent}">
         <svg>
@@ -676,53 +675,37 @@ setInterval(() => {
     const percentEl = wrapper.querySelector(".percent");
     const extraEl = wrapper.querySelector(".extra-count");
 
-    const base = parseInt(wrapper.dataset.base || "0"); // 45 أو 90
+    const base = parseInt(wrapper.dataset.base || "0");
     const showExtra = wrapper.dataset.showExtra === "true";
-    const isSecondHalf = base >= 90;
-    const isFirstHalf = base >= 45 && base < 90;
+    const isRest = wrapper.dataset.isRest === "true";
+
+    if (isRest) return; // 💤 استراحة، لا نعد شيئًا
 
     let seconds = parseInt(wrapper.dataset.seconds || "0");
     seconds = (seconds + 1) % 60;
-
     wrapper.dataset.seconds = seconds;
+
     const secStr = String(seconds).padStart(2, '0');
 
-    // ⏱️ الوقت الإضافي
-    let currentMinute;
+    // ⏱️ نبدأ بالوقت الإضافي
     if (showExtra) {
-      // لما ندخل وقت إضافي، العد يبدأ من 00:00
       let extraMinutes = parseInt(wrapper.dataset.extraTime || "0");
+
       if (seconds === 0) extraMinutes++;
       wrapper.dataset.extraTime = extraMinutes;
 
-      // ⏱️ تحديث الوقت المعروض
+      // ✅ تحديث الوقت الإضافي فقط
       if (extraEl) extraEl.textContent = `${extraMinutes}:${secStr}`;
-      if (timeEl) timeEl.textContent = `${base}:00`; // سبّت الوقت عند نهاية الشوط
+      if (timeEl) timeEl.textContent = `${base}:00`; // ثابت
 
-      currentMinute = base + extraMinutes; // لحساب النسبة
-    } else {
-      let current = base;
-      if (seconds === 0) current++;
-      currentMinute = current;
-
-      if (timeEl) timeEl.textContent = `${current}:${secStr}`;
+      // 🧮 تحديث الدائرة
+      const currentMinute = base + extraMinutes;
+      let maxTime = base === 45 ? 60 : 120; // تقدر تخصصلها لو عاوز
+      const percent = Math.min(100, (currentMinute / maxTime) * 100);
+      percentEl.style.setProperty('--circumference', `${circumference}`);
+      percentEl.style.setProperty('--percent', percent);
+      percentEl.style.setProperty('--num', percent);
     }
-
-    // ✅ حساب النسبة بحسب نوع الشوط
-    let maxTime = 90;
-    if (isSecondHalf && showExtra) {
-      maxTime = 120;
-    } else if (isFirstHalf && showExtra) {
-      maxTime = 60;
-    } else if (isFirstHalf) {
-      maxTime = 45;
-    }
-
-    const percent = Math.min(100, (currentMinute / maxTime) * 100);
-
-    // ⭕ تحديث الدائرة
-    percentEl.style.setProperty('--circumference', `${circumference}`);
-    percentEl.style.setProperty('--percent', percent);
-    percentEl.style.setProperty('--num', percent);
   });
 }, 1000);
+
