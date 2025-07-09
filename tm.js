@@ -38,37 +38,40 @@ const allowedKeys = {
 };
 
 async function checkAuthorization(apiKey) {
-  const currentBlogId = await getBlogIdFromJsonFeed(location.origin);
-  if (!currentBlogId) {
-    displayAccessError("تعذر جلب بيانات المدونة");
-    return false;
-  }
-
-  const expectedId = allowedKeys[apiKey];
-  if (!expectedId) {
-    displayAccessError("🚫 مفتاح الدخول غير صحيح. تأكد من إدخال الكود الصحيح.", true);
-    return false;
-  }
-
-  if (expectedId !== currentBlogId) {
-    displayAccessError("🚫 هذه المدونة غير مصرح لها باستخدام الإضافة. يرجى التواصل معنا لتفعيلها.");
-    return false;
-  }
-
-  return true;
+const currentBlogId = await getBlogIdFromJsonFeed(location.origin);
+if (!currentBlogId) {
+displayAccessError("⚠️ تعذر جلب بيانات المدونة");
+return false;
 }
-  function displayAccessError(msg, isKeyError = false) {
-  document.body.innerHTML = `
-    <div style="font-family:'Cairo',sans-serif;text-align:center;padding:50px;color:#fff;background:#1b1d2a;min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;">
-      <h2 style="color:#FF3131">⛔ صلاحية مرفوضة</h2>
-      <p style="font-size:16px;margin:10px 0 20px;">${msg}</p>
-      <a href="https://wa.me/201021312224?text=مرحبًا، أواجه مشكلة في استخدام إضافة جوكا للمباريات.${isKeyError ? '%0Aالخطأ في مفتاح الدخول' : '%0Aالمدونة غير مفعلة'}" target="_blank" style="background:#25D366;padding:10px 20px;border-radius:8px;color:#fff;text-decoration:none;font-weight:bold;">
-        💬 تواصل مع الدعم عبر واتساب
-      </a>
-    </div>
-  `;
-  throw new Error("Unauthorized Access");
+
+// تحقق: هل هذا الـ blogId مفعّل أصلاً؟
+const matchingKey = Object.entries(allowedKeys).find(([key, id]) => id === currentBlogId);
+
+if (!matchingKey) {
+displayAccessError(🚫 هذه المدونة (${currentBlogId}) غير مفعلة لاستخدام الإضافة., false, currentBlogId);
+return false;
 }
+
+// تحقق من الـ apiKey
+if (matchingKey[0] !== apiKey) {
+displayAccessError(🚫 مفتاح الدخول غير صحيح لهذه المدونة (${currentBlogId})., true, currentBlogId);
+return false;
+}
+
+// ✅ كل شيء تمام
+return true;
+}
+function displayAccessError(msg, isKeyError = false, blogId = "") {
+const encodedBlogId = encodeURIComponent(blogId);
+const whatsappMsg = isKeyError
+? `مرحبًا، أواجه مشكلة في مفتاح الدخول الخاص بإضافة جوكا للمباريات.%0Aمدونة: ${encodedBlogId}`
+: `مرحبًا، أواجه مشكلة في تفعيل إضافة جوكا للمباريات على مدونتي.%0Aمدونة: ${encodedBlogId}`;
+
+document.body.innerHTML = `<div style="font-family:'Cairo',sans-serif;text-align:center;padding:50px;color:#fff;background:#1b1d2a;min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;"> <h2 style="color:#FF3131">⛔ صلاحية مرفوضة</h2> <p style="font-size:16px;margin:10px 0 20px;">${msg}</p> <a href="https://wa.me/201021312224?text=${whatsappMsg}" target="_blank" style="background:#25D366;padding:10px 20px;border-radius:8px;color:#fff;text-decoration:none;font-weight:bold;"> 💬 تواصل مع الدعم عبر واتساب </a> </div>` ;
+throw new Error("Unauthorized Access");
+}
+
+
 
 // ثم استخدمه هكذا
 // ⚙️ توليد توقيع SHA-256
