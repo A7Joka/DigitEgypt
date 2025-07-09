@@ -41,6 +41,8 @@ function displayStructureError(msg) {
     </div>
   `;
 }
+  checkJokaMatchStructure();
+
 // 🎯 جلب Blog ID من JSON feed فقط
 async function getBlogIdFromJsonFeed(blogUrl) {
   try {
