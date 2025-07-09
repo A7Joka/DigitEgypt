@@ -19,6 +19,8 @@
     }
   }
   const apiKey = document.currentScript.getAttribute("api-key");
+  const containers = document.querySelectorAll("JokaMatch");
+
 function checkJokaMatchStructure() {
   const jokaContainers = document.querySelectorAll("JokaMatch");
 
@@ -46,8 +48,6 @@ function checkJokaMatchStructure() {
       "broken-structure"
     );
     throw new Error("Invalid <JokaMatch> structure");
-  } else {
-    const containers = document.querySelectorAll("JokaMatch");
   }
 }
 
