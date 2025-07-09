@@ -94,7 +94,9 @@
     function verifyKey() {
       const key = document.getElementById("apiKeyInput").value.trim();
       if (!key) return alert("⚠️ أدخل كود صحيح");
-async function generateSignature(str) {
+      fetchMatches("today");
+}
+    async function generateSignature(str) {
   const buffer = new TextEncoder().encode(str);
   const digest = await crypto.subtle.digest("SHA-256", buffer);
   return [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2, "0")).join("");
@@ -120,9 +122,11 @@ if (!json.matches || !Array.isArray(json.matches)) {
             throw new Error("❌ لا توجد مباريات");
           }
           renderMatches(json.matches);
+}  catch (e) {
+    alert("⚠️ حدث خطأ أثناء جلب المباريات");
+    console.error(e);
+  }
 }
-      
-
     function renderMatches(matches) {
       const list = document.getElementById("match-list");
       list.innerHTML = "";
