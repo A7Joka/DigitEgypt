@@ -48,13 +48,13 @@ return false;
 const matchingKey = Object.entries(allowedKeys).find(([key, id]) => id === currentBlogId);
 
 if (!matchingKey) {
-displayAccessError(🚫 هذه المدونة (${currentBlogId}) غير مفعلة لاستخدام الإضافة., false, currentBlogId);
+displayAccessError("🚫 هذه المدونة (${currentBlogId}) غير مفعلة لاستخدام الإضافة., false, currentBlogId");
 return false;
 }
 
 // تحقق من الـ apiKey
 if (matchingKey[0] !== apiKey) {
-displayAccessError(🚫 مفتاح الدخول غير صحيح لهذه المدونة (${currentBlogId})., true, currentBlogId);
+displayAccessError("🚫 مفتاح الدخول غير صحيح لهذه المدونة (${currentBlogId})., true, currentBlogId");
 return false;
 }
 
