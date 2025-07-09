@@ -46,6 +46,8 @@ function checkJokaMatchStructure() {
       "broken-structure"
     );
     throw new Error("Invalid <JokaMatch> structure");
+  } else {
+    const containers = document.querySelectorAll("JokaMatch");
   }
 }
 
