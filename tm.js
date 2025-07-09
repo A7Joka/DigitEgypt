@@ -174,6 +174,48 @@ JokaMatch {
   text-align: center;
   font-family: 'Cairo', sans-serif;
 }
+.joka-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+}
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #39dbbf;
+  border-top: 4px solid transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 10px;
+}
+.joka-loader-text {
+  color: var(--text, #bfc3d4);
+  font-size: 14px;
+  font-weight: bold;
+  animation: fadeIn 1s ease-in-out infinite alternate;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes fadeIn {
+  from { opacity: 0.4; }
+  to { opacity: 1; }
+}
+.joka-no-matches {
+  padding: 40px 0;
+  text-align: center;
+  color: var(--text, #bfc3d4);
+  font-size: 14px;
+  opacity: 0.8;
+}
+.joka-error {
+  text-align: center;
+  padding: 50px 20px;
+  color: var(--text, #bfc3d4);
+}
 
 /* === Inline Match Item === */
 .inline-match-item {
@@ -679,8 +721,9 @@ if (match["Match-Status"].includes("تأجلت")) {
   containers.forEach(container => {
     const divs = container.querySelectorAll("div[day]");
     divs.forEach(async div => {
+    
       const day = div.getAttribute("day") || "today";
-      const flt = div.getAttribute("flt") || "2";
+      const flt = div.getAttribute("flt") || "1";
       const theme = div.getAttribute("theme") || "dark";
 
       div.style.setProperty('--bg', theme === "dark" ? '#151825' : '#f3f3f3');
@@ -693,7 +736,24 @@ const linksAttr = div.getAttribute("link") || "";
 const linksArray = linksAttr.split(",").map(l => l.trim());
 let globalMatchIndex = 0;
       try {
+        div.innerHTML = `
+  <div class="joka-loader">
+    <div class="spinner"></div>
+    <p class="joka-loader-text">جارٍ تحميل المباريات...</p>
+  </div>
+`;
+
         const matches = await fetchMatches(day);
+        if (!matches.length) {
+  div.innerHTML = `
+    <div class="joka-no-matches">
+      <img src="https://cdn-icons-png.flaticon.com/512/7486/7486530.png" width="80" style="opacity: 0.5;" />
+      <p>لا توجد مباريات في هذا اليوم.</p>
+    </div>
+  `;
+  return;
+}
+
         if (flt === "1") {
           const grouped = {};
           matches.forEach(match => {
@@ -757,14 +817,27 @@ globalMatchIndex++;
 }).join("");
           return `<div class="match-section-title">${title}</div>${items}`;
         };
-
+        div.innerHTML = "";
+div.style.opacity = 0;
+setTimeout(() => {
         div.innerHTML = `
           ${renderSection("جارية الآن", live)}
           ${renderSection("المباريات القادمة", upcoming)}
           ${renderSection("مباريات انتهت", ended)}
         `;
+  div.style.transition = "opacity 0.5s ease";
+  div.style.opacity = 1;
+}, 200);
       } catch (e) {
-        div.innerHTML = "<p style='color:red'>⚠️ حدث خطأ أثناء تحميل البيانات</p>";
+        div.innerHTML = `
+  <div class="joka-error">
+    <img src="https://cdn-icons-png.flaticon.com/512/610/610395.png" width="70" style="margin-bottom: 10px;" />
+    <h3>تعذر تحميل المباريات</h3>
+    <p style="font-size:13px;opacity:0.8;">يرجى التحقق من الاتصال بالإنترنت أو المحاولة لاحقًا.</p>
+    <button onclick="location.reload()" style="margin-top:10px;background:#39dbbf;color:white;padding:8px 16px;border:none;border-radius:6px;cursor:pointer;">🔄 إعادة المحاولة</button>
+  </div>
+`;
+
         console.error(e);
       }
     });
