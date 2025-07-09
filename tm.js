@@ -483,7 +483,7 @@ let baseMinute = rawMinute;
 let extraTime = 0;
 let showExtra = false;
 
-if ((isFirstHalf && rawMinute > 45) || (isSecondHalf && rawMinute > 90)) {
+if ((isFirstHalf && rawMinute >= 45) || (isSecondHalf && rawMinute >= 90)) {
 baseMinute = isFirstHalf ? 45 : 90;
 extraTime = rawMinute - baseMinute;
 showExtra = true;
@@ -726,7 +726,7 @@ setInterval(() => {
     else if (base === 105) maxTime = 105;
     else if (base === 120) maxTime = 120;
 
-    const percent = Math.min(100, (currentMinute / maxTime) * 100);
+    const percent = Math.min(100, (currentMinute * 1.11111));
 
     // 🟢 تحديث الدائرة
     percentEl.style.setProperty('--circumference', `${circumference}`);
