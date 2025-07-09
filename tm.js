@@ -446,7 +446,7 @@ const status = match["Match-Status"];
 if (status.includes("جارية") || status.includes("شوط")) {
 const minute = (timeNow > 0 && timeNow <= 130) ? timeNow : 0;
 return { type: "live", minute, label: status };
-} else if (status.includes("انتهت")||(status.includes("الترجيح")) {
+} else if (status.includes("انتهت")||status.includes("الترجيح")) {
 return { type: "ended" };
 } else {
 return {
