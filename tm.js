@@ -623,9 +623,10 @@ let globalMatchIndex = 0;
             });
 
             const sorted = [...live, ...soon, ...future, ...ended];
-            upcoming.sort((a, b) => new Date(a["Time-Start"]) - new Date(b["Time-Start"]));
-live.sort((a, b) => (b["Time-Now"] || 0) - (a["Time-Now"] || 0));
-ended.sort((a, b) => new Date(b["Time-End"] || b["Time-Start"]) - new Date(a["Time-End"] || a["Time-Start"]));
+            soon.sort((a, b) => new Date(a["Time-Start"]) - new Date(b["Time-Start"]));
+            future.sort((a, b) => new Date(a["Time-Start"]) - new Date(b["Time-Start"]));
+            live.sort((a, b) => (b["Time-Now"] || 0) - (a["Time-Now"] || 0));
+            ended.sort((a, b) => new Date(b["Time-End"] || b["Time-Start"]) - new Date(a["Time-End"] || a["Time-Start"]));
             const section = sorted.map((match, index) => {
 const link = linksArray[globalMatchIndex] || "#";
               globalMatchIndex++;
