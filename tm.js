@@ -827,39 +827,55 @@ if (!filteredMatches.length) {
           return;
         }
 
-        const live = [], upcoming = [], ended = [];
-        matches.forEach(match => {
-          const status = match["Match-Status"];
-          if (status.includes("جارية") || status.includes("شوط")) live.push(match);
-          else if (status.includes("انتهت") || status.includes("إنتهت")) ended.push(match);
-          else upcoming.push(match);
-        });
-        // ترتيب حسب الوقت داخل كل حالة
-upcoming.sort((a, b) => new Date(a["Time-Start"]) - new Date(b["Time-Start"]));
-live.sort((a, b) => (b["Time-Now"] || 0) - (a["Time-Now"] || 0));
-ended.sort((a, b) => new Date(b["Time-End"] || b["Time-Start"]) - new Date(a["Time-End"] || a["Time-Start"]));
+const live = [], upcoming = [], ended = [];
 
+matches.forEach(match => {
+  const matchId = match["Match-id"];
+  const link = linksMap?.[matchId] ?? "#";
+  if (link === "--hide--") return; // تجاهل المباراة المخفية
 
-        const renderSection = (title, list) => {
-          if (!list.length) return "";
-const items = list.map((match, index) => {
-const matchId = match["Match-id"]; const link = linksMap[matchId] || "#"; if (link === "--hide--") return ""; // لتجاهل المباراة
-globalMatchIndex++;
-  return buildMatchCard(match, link);
-}).join("");
-          return `<div class="match-section-title">${title}</div>${items}`;
-        };
-        div.innerHTML = "";
-div.style.opacity = 0;
-setTimeout(() => {
-        div.innerHTML = `
-          ${renderSection("جارية الآن", live)}
-          ${renderSection("المباريات القادمة", upcoming)}
-          ${renderSection("مباريات انتهت", ended)}`
-        ;
-  div.style.transition = "opacity 0.5s ease";
-  div.style.opacity = 1;
-}, 200);
+  const status = match["Match-Status"];
+  if (status.includes("جارية") || status.includes("شوط")) live.push({ match, link });
+  else if (status.includes("انتهت") || status.includes("إنتهت")) ended.push({ match, link });
+  else upcoming.push({ match, link });
+});
+
+// ترتيب
+upcoming.sort((a, b) => new Date(a.match["Time-Start"]) - new Date(b.match["Time-Start"]));
+live.sort((a, b) => (b.match["Time-Now"] || 0) - (a.match["Time-Now"] || 0));
+ended.sort((a, b) => new Date(b.match["Time-End"] || b.match["Time-Start"]) - new Date(a.match["Time-End"] || a.match["Time-Start"]));
+
+// دالة ترجع جزء HTML لكل قسم
+const renderSection = (title, list) => {
+  if (!list.length) return "";
+  const items = list.map(({ match, link }) => buildMatchCard(match, link)).join("");
+  return `<div class="match-section-title">${title}</div>${items}`;
+};
+
+const allVisibleMatchesCount = live.length + upcoming.length + ended.length;
+
+if (allVisibleMatchesCount === 0) {
+  div.innerHTML = `
+    <div class="joka-no-matches">
+      <img src="https://cdn-icons-png.flaticon.com/512/7486/7486530.png" width="80" style="opacity: 0.5;" />
+      <p>لا توجد مباريات متاحة للعرض.</p>
+    </div>
+  `;
+} else {
+  div.innerHTML = "";
+  div.style.opacity = 0;
+
+  setTimeout(() => {
+    div.innerHTML = `
+      ${renderSection("جارية الآن", live)}
+      ${renderSection("المباريات القادمة", upcoming)}
+      ${renderSection("مباريات انتهت", ended)}
+    `;
+    div.style.transition = "opacity 0.5s ease";
+    div.style.opacity = 1;
+  }, 200);
+}
+
       } catch (e) {
         div.innerHTML = `
   <div class="joka-error">
