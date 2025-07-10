@@ -109,6 +109,34 @@
       font-size: 14px;
       resize: none;
     }
+    .section-title {
+  padding: 0 15px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.matches-date-filter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.date-next-prev {
+  background: #1e2133;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  width: 30px;
+  height: 30px;
+  font-size: 18px;
+  cursor: pointer;
+}
+.filtered-date {
+  font-weight: bold;
+  font-size: 14px;
+  color: #39DBBF;
+}
+
   </style>
 </head>
 <body>
@@ -125,15 +153,23 @@
       <button id="verify-btn" style="width:29%">تحقق من الكود</button>
 
       <div id="matches-area" class="hidden">
-        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-  <select id="dateSelector" onchange="handleDateChange()">
-    <option value="today">اليوم</option>
-    <option value="tomorrow">الغد</option>
-    <option value="yesterday">الأمس</option>
-    <option value="custom">تاريخ مخصص</option>
-  </select>
-  <input type="date" id="customDate" class="hidden" onchange="handleDateChange()" style="background:#1e2133; color:white; border:none; border-radius:6px;">
+        <div class="championship-wrap important-matches">
+  <div class="section-title">
+    <h3>📅 فلاتر المباريات</h3>
+    <div class="section-actions">
+      <div class="matches-date-filter">
+        <div class="inline-date-filter">
+          <button id="prev-date" class="date-next-prev" title="اليوم السابق">⬅️</button>
+          <span id="displayed-date" class="filtered-date" data-date="">--</span>
+          <button id="next-date" class="date-next-prev" title="اليوم التالي">➡️</button>
+        </div>
+        <input type="date" id="custom-date" style="margin-right:10px; background:#1e2133; color:#fff; border:none; border-radius:6px;">
+      </div>
+    </div>
+  </div>
+  <div id="matchCounter" style="margin-bottom: 16px; font-size: 14px; color:#ccc;"></div>
 </div>
+
 
 <div id="matchCounter" style="margin-bottom: 12px; font-size: 14px;"></div>
 
@@ -279,6 +315,40 @@ function toggleInput(id) {
     fetchMatches(val);
   }
 }
+let currentDate = new Date();
+
+function updateDateDisplay() {
+  const options = { day: "numeric", month: "long", year: "numeric" };
+  document.getElementById("displayed-date").textContent = currentDate.toLocaleDateString("ar-EG", options);
+  document.getElementById("displayed-date").dataset.date = currentDate.toISOString().split("T")[0];
+  document.getElementById("custom-date").value = currentDate.toISOString().split("T")[0];
+}
+
+function loadMatchesByDate() {
+  const formatted = currentDate.toISOString().split("T")[0];
+  fetchMatches(formatted);
+}
+
+document.getElementById("prev-date").addEventListener("click", () => {
+  currentDate.setDate(currentDate.getDate() - 1);
+  updateDateDisplay();
+  loadMatchesByDate();
+});
+
+document.getElementById("next-date").addEventListener("click", () => {
+  currentDate.setDate(currentDate.getDate() + 1);
+  updateDateDisplay();
+  loadMatchesByDate();
+});
+
+document.getElementById("custom-date").addEventListener("change", e => {
+  currentDate = new Date(e.target.value);
+  updateDateDisplay();
+  loadMatchesByDate();
+});
+
+// أول مرة
+updateDateDisplay();
 
 </script>
 </body>
