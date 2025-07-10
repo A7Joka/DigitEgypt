@@ -169,51 +169,42 @@
       }
     }
 
-    function renderMatches(matches) {
-      const list = document.getElementById("match-list");
-      list.innerHTML = "";
-      document.getElementById("matches-area").classList.remove("hidden");
+function renderMatches(matches) {
+  const list = document.getElementById("match-list");
+  list.innerHTML = "";
+  document.getElementById("matches-area").classList.remove("hidden");
 
-      matches.forEach(match => {
-        const matchId = match["Match-id"];
-        const right = match["Team-Right"];
-        const left = match["Team-Left"];
-        const cup = match["Cup-Name"] || "بطولة غير معروفة";
+  matches.forEach(match => {
+    const matchId = match["Match-id"];
+    const right = match["Team-Right"];
+    const left = match["Team-Left"];
+    const cup = match["Cup-Name"] || "بطولة غير معروفة";
 
-        const row = document.createElement("div");
-        row.className = "match-row";
-        row.innerHTML = `
-          <input type="checkbox" id="chk-${matchId}" onchange="toggleMatchCard('${matchId}')">
-          <label for="chk-${matchId}">${right.Name} × ${left.Name}</label>
-          <div id="card-${matchId}" class="match-card hidden">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <div style="text-align:center;">
-                <img src="${right.Logo}" alt="${right.Name}" style="width:30px; height:30px;"><br>
-                <small>${right.Name}</small>
-              </div>
-              <div style="font-weight:bold;">×</div>
-              <div style="text-align:center;">
-                <img src="${left.Logo}" alt="${left.Name}" style="width:30px; height:30px;"><br>
-                <small>${left.Name}</small>
-              </div>
-            </div>
-            <p style="text-align:center; font-size:13px; color:#aaa;">🏆 ${cup}</p>
-            <input type="text" id="link-${matchId}" placeholder="رابط المباراة">
-          </div>
-        `;
-        list.appendChild(row);
-      });
-    }
+    const row = document.createElement("div");
+    row.className = "match-row";
+    row.innerHTML = `
+      <div style="text-align:center; font-size:14px; font-weight:bold; margin-bottom:10px;">🏆 ${cup}</div>
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+        <div style="text-align:center;">
+          <img src="${right.Logo}" alt="${right.Name}" style="width:30px; height:30px;"><br>
+          <small>${right.Name}</small>
+        </div>
+        <div style="font-weight:bold;">X</div>
+        <div style="text-align:center;">
+          <img src="${left.Logo}" alt="${left.Name}" style="width:30px; height:30px;"><br>
+          <small>${left.Name}</small>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-top:10px;">
+        <input type="text" id="link-${matchId}" placeholder="رابط المباراة" disabled style="flex:1; margin-left:10px;">
+        <input type="checkbox" id="chk-${matchId}" onchange="document.getElementById('link-${matchId}').disabled = !this.checked">
+      </div>
+    `;
+    list.appendChild(row);
+  });
+}
 
-    function toggleMatchCard(id) {
-      const card = document.getElementById(`card-${id}`);
-      const checked = document.getElementById(`chk-${id}`).checked;
-      if (checked) {
-        card.classList.remove("hidden");
-      } else {
-        card.classList.add("hidden");
-      }
-    }
+
   </script>
 </body>
 </html>
