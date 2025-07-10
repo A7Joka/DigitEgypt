@@ -263,11 +263,15 @@
     <div class="matches-date-filter">
       <div class="inline-date-filter">
         <a href="javascript:void(0)" id="prev-date" class="date-next-prev">
-          ⬅️
+          <svg xmlns="http://www.w3.org/2000/svg" width="5" height="8.75" viewBox="0 0 5 8.75">
+            <path d="M3.491,4.375.183,7.683a.625.625,0,0,0,.884.884l3.75-3.75a.625.625,0,0,0,0-.884L1.067.183a.625.625,0,0,0-.884.884Z" fill="#bfc3d4"/>
+          </svg>
         </a>
         <span id="displayed-date" class="filtered-date">--</span>
         <a href="javascript:void(0)" id="next-date" class="date-next-prev">
-          ➡️
+          <svg xmlns="http://www.w3.org/2000/svg" width="5" height="8.75" viewBox="0 0 5 8.75">
+            <path d="M3.491,4.375.183,7.683a.625.625,0,0,0,.884.884l3.75-3.75a.625.625,0,0,0,0-.884L1.067.183a.625.625,0,0,0-.884.884Z" transform="rotate(180 2.5 4.375)" fill="#bfc3d4"/>
+          </svg>
         </a>
       </div>
 
@@ -288,7 +292,7 @@
 
         <h3>✅ حدد المباريات وضع الروابط:</h3>
         <div id="match-list"></div>
-        <div id="counter" style="margin-bottom:10px;font-size:14px,width:59%"></div>
+        <div id="counter" style="display: inline;margin-bottom:10px;font-size:14px;width:59%"></div>
         <button id="generate-btn" style="width:19%">🎉 توليد الكود</button>
         <button onclick="resetAll()" style="width:19%;background:#ff5252">🔄 إعادة تعيين الكل</button>
         
