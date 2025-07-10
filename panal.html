@@ -40,12 +40,13 @@
       border-radius: 6px;
       padding: 10px;
       margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
     }
-    .match-row input[type="text"] {
-      flex: 1;
+    .match-card {
+      width: 100%;
+      margin-top: 10px;
+      background: #26293c;
+      padding: 10px;
+      border-radius: 8px;
     }
     .code-output {
       background: #1e2133;
@@ -73,7 +74,11 @@
         <h3>✅ حدد المباريات وضع الروابط:</h3>
         <div id="match-list"></div>
         <button id="generate-btn">🎉 توليد الكود</button>
-        <textarea id="finalCode" class="code-output" rows="6" readonly onclick="this.select();"></textarea>
+
+        <div style="position: relative;">
+          <textarea id="finalCode" class="code-output" rows="6" readonly onclick="this.select();"></textarea>
+          <button onclick="copyFinalCode()" style="position:absolute; bottom:10px; left:10px; padding:6px 12px; background:#39DBBF; border:none; border-radius:6px; color:#fff; cursor:pointer;">📋 نسخ الكود</button>
+        </div>
       </div>
     </div>
   </div>
@@ -107,12 +112,10 @@
 
       checkboxes.forEach(chk => {
         const id = chk.id.replace("chk-", "");
-        if (chk.checked) {
-          const val = document.getElementById(`link-${id}`).value.trim();
-          map[id] = val || "#";
-        } else {
-          map[id] = "--hide--";
-        }
+        const isChecked = chk.checked;
+        const linkInput = document.getElementById(`link-${id}`);
+        const value = isChecked ? (linkInput?.value.trim() || "#") : "--hide--";
+        map[id] = value;
       });
 
       const json = JSON.stringify(map);
@@ -129,13 +132,11 @@
       document.getElementById("finalCode").value = final;
     }
 
-    function escapeHtml(str) {
-      return str
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#39;");
+    function copyFinalCode() {
+      const code = document.getElementById("finalCode").value;
+      navigator.clipboard.writeText(code).then(() => {
+        alert("✅ تم نسخ الكود!");
+      });
     }
 
     async function generateSignature(str) {
@@ -175,17 +176,45 @@
 
       matches.forEach(match => {
         const matchId = match["Match-id"];
-        const title = `${match["Team-Right"].Name} × ${match["Team-Left"].Name}`;
+        const right = match["Team-Right"];
+        const left = match["Team-Left"];
+        const cup = match["Cup-Name"] || "بطولة غير معروفة";
 
         const row = document.createElement("div");
         row.className = "match-row";
         row.innerHTML = `
-          <input type="checkbox" id="chk-${matchId}" onchange="document.getElementById('link-${matchId}').classList.toggle('hidden')">
-          <label for="chk-${matchId}">${title}</label>
-          <input type="text" id="link-${matchId}" placeholder="رابط المباراة" class="hidden">
+          <input type="checkbox" id="chk-${matchId}" onchange="toggleMatchCard('${matchId}')">
+          <label for="chk-${matchId}"><div id="card-${matchId}">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div style="text-align:center;">
+                <img src="${right.Logo}" alt="${right.Name}" style="width:30px; height:30px;"><br>
+                <small>${right.Name}</small>
+              </div>
+              <div style="font-weight:bold;">×</div>
+              <div style="text-align:center;">
+                <img src="${left.Logo}" alt="${left.Name}" style="width:30px; height:30px;"><br>
+                <small>${left.Name}</small>
+              </div>
+            </div>
+            <p style="text-align:center; font-size:13px; color:#aaa;">🏆 ${cup}</p>
+          </div>
+          </label>
+          <div id="card-${matchId}" class="match-card hidden">
+            <input type="text" id="link-${matchId}" placeholder="رابط المباراة">
+          </div>
         `;
         list.appendChild(row);
       });
+    }
+
+    function toggleMatchCard(id) {
+      const card = document.getElementById(`card-${id}`);
+      const checked = document.getElementById(`chk-${id}`).checked;
+      if (checked) {
+        card.classList.remove("hidden");
+      } else {
+        card.classList.add("hidden");
+      }
     }
   </script>
 </body>
