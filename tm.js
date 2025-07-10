@@ -778,8 +778,9 @@ let globalMatchIndex = 0;
     list.forEach(match => {
       const matchId = match["ID"];
       const link = linksMap?.[matchId];
-        if (link === "--hide--") return;
-      return buildMatchCard(match, link || "#");
+if (link === "--hide--") return;
+const finalLink = link || "#";
+return buildMatchCard(match, finalLink);
       const start = new Date(match["Time-Start"]);
       const diffMin = Math.floor((start - now) / 60000);
       const status = match["Match-Status"];
@@ -825,7 +826,9 @@ matches.forEach(match => {
   const matchId = match["ID"];
 const link = linksMap?.[matchId];
 if (link === "--hide--") return;
-return buildMatchCard(match, link || "#");
+const finalLink = link || "#";
+return buildMatchCard(match, finalLink);
+
   const status = match["Match-Status"];
   if (status.includes("جارية") || status.includes("شوط")) live.push(match);
   else if (status.includes("انتهت") || status.includes("إنتهت")) ended.push(match);
