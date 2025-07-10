@@ -796,7 +796,7 @@ const section = sorted.map((match, index) => {
 }).join("");
 
 
-            return <div class="match-section-title">${cup}</div>${section};
+            return `<div class="match-section-title">${cup}</div>${section}`;
           }).join("");
 
           div.innerHTML = html;
