@@ -422,13 +422,14 @@ function toggleInput(id) {
 }
 
 // أول مرة
+    let currentDate = new Date();
+
 updateDateDisplay();
 function updateCounter() {
   const total = matches.length;
   const selected = document.querySelectorAll("input[type='checkbox']:checked").length;
   document.getElementById("counter").textContent = `✅ تم تحديد ${selected} من أصل ${total}`;
 }
-  let currentDate = new Date();
 
 function updateDateDisplay() {
   const display = document.getElementById("displayed-date");
