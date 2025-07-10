@@ -338,6 +338,7 @@ function toggleInput(id) {
   const inputBox = document.getElementById(`card-${id}`);
   const chk = document.getElementById(`chk-${id}`);
   inputBox.classList.toggle("hidden", !chk.checked);
+    updateCounter();
 }
   function handleDateChange() {
   const val = document.getElementById("dateSelector").value;
