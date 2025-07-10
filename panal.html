@@ -292,6 +292,7 @@ async function fetchMatches(day) {
     const rawText = await res.text();
     const json = JSON.parse(rawText.replace(/^NinJoka\((.*)\)$/, "$1"));
     if (!json.matches || !Array.isArray(json.matches)) throw new Error("❌ لا توجد مباريات");
+    matches = json.matches || [];
     renderMatches(json.matches);
   } catch (e) {
     alert("⚠️ حدث خطأ أثناء جلب المباريات");
@@ -384,7 +385,6 @@ document.getElementById("custom-date").addEventListener("change", e => {
 // أول مرة
 updateDateDisplay();
 function updateCounter() {
-  const matches = json.matches;
   const total = matches.length;
   const selected = document.querySelectorAll("input[type='checkbox']:checked").length;
   document.getElementById("counter").textContent = `✅ تم تحديد ${selected} من أصل ${total}`;
