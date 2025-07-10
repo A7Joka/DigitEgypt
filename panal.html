@@ -130,7 +130,7 @@
         <button id="generate-btn" style="width:100%">🎉 توليد الكود</button>
 
         <div style="position: relative;">
-          <textarea id="finalCode" rows="6" readonly onclick="this.select();"></textarea>
+          <textarea id="finalCode" style="width:97%" rows="6" readonly onclick="this.select();"></textarea>
           <button onclick="copyFinalCode()" style="position:absolute; bottom:10px; left:10px;">📋 نسخ الكود</button>
         </div>
       </div>
@@ -242,7 +242,7 @@ function renderMatches(matches) {
         <div class="match-x">X</div>
         <div class="team-block"><span>${left.Name}</span><img src="${left.Logo}"></div>
         <div class="input-link hidden" id="card-${matchId}">
-          <input type="text" id="link-${matchId}" placeholder="رابط المباراة">
+          <input type="text" style="width:97%" id="link-${matchId}" placeholder="رابط المباراة">
         </div>
       </div>
     `;
