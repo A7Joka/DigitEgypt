@@ -837,13 +837,13 @@ setTimeout(() => {
   div.style.opacity = 1;
 }, 200);
       } catch (e) {
-        div.innerHTML = 
+        div.innerHTML = `
   <div class="joka-error">
     <img src="https://cdn-icons-png.flaticon.com/512/610/610395.png" width="70" style="margin-bottom: 10px;" />
     <h3>تعذر تحميل المباريات</h3>
     <p style="font-size:13px;opacity:0.8;">يرجى التحقق من الاتصال بالإنترنت أو المحاولة لاحقًا.</p>
     <button onclick="location.reload()" style="margin-top:10px;background:#39dbbf;color:white;padding:8px 16px;border:none;border-radius:6px;cursor:pointer;">🔄 إعادة المحاولة</button>
-  </div>
+  </div>`
 ;
 
         console.error(e);
