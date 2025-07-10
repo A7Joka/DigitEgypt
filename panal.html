@@ -184,7 +184,8 @@
         row.className = "match-row";
         row.innerHTML = `
           <input type="checkbox" id="chk-${matchId}" onchange="toggleMatchCard('${matchId}')">
-          <label for="chk-${matchId}"><div id="card-${matchId}">
+          <label for="chk-${matchId}">${right.Name} × ${left.Name}</label>
+          <div id="card-${matchId}" class="match-card hidden">
             <div style="display:flex; justify-content:space-between; align-items:center;">
               <div style="text-align:center;">
                 <img src="${right.Logo}" alt="${right.Name}" style="width:30px; height:30px;"><br>
@@ -197,9 +198,6 @@
               </div>
             </div>
             <p style="text-align:center; font-size:13px; color:#aaa;">🏆 ${cup}</p>
-          </div>
-          </label>
-          <div id="card-${matchId}" class="match-card hidden">
             <input type="text" id="link-${matchId}" placeholder="رابط المباراة">
           </div>
         `;
