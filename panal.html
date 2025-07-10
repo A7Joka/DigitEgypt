@@ -16,12 +16,10 @@
       margin: auto;
     }
     input, textarea, button {
-      width: 100%;
-      padding: 10px;
-      border-radius: 8px;
-      margin-bottom: 12px;
       font-family: inherit;
       border: none;
+      border-radius: 8px;
+      padding: 10px;
     }
     input, textarea {
       background: #1e2133;
@@ -35,25 +33,75 @@
     .hidden {
       display: none;
     }
-    .match-row {
+
+    .match-wrapper {
+      margin-bottom: 15px;
+      border: 1px solid #2e3247;
+      border-radius: 10px;
       background: #1e2133;
-      border-radius: 6px;
       padding: 10px;
-      margin-bottom: 8px;
     }
-    .match-card {
+
+    .cup-title {
+      text-align: center;
+      font-weight: bold;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    .teams {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .team {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .team img {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+    }
+
+    .match-center {
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .control-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .control-bar input[type="text"] {
+      flex: 1;
+    }
+
+    .match-checkbox {
+      margin-top: 5px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    #finalCode {
       width: 100%;
-      margin-top: 10px;
-      background: #26293c;
-      padding: 10px;
-      border-radius: 8px;
-    }
-    .code-output {
       background: #1e2133;
       padding: 15px;
+      margin-top: 20px;
       border-radius: 8px;
-      font-size: 14px;
       direction: ltr;
+      font-size: 14px;
+      resize: none;
     }
   </style>
 </head>
@@ -76,98 +124,92 @@
         <button id="generate-btn">🎉 توليد الكود</button>
 
         <div style="position: relative;">
-          <textarea id="finalCode" class="code-output" rows="6" readonly onclick="this.select();"></textarea>
-          <button onclick="copyFinalCode()" style="position:absolute; bottom:10px; left:10px; padding:6px 12px; background:#39DBBF; border:none; border-radius:6px; color:#fff; cursor:pointer;">📋 نسخ الكود</button>
+          <textarea id="finalCode" rows="6" readonly onclick="this.select();"></textarea>
+          <button onclick="copyFinalCode()" style="position:absolute; bottom:10px; left:10px;">📋 نسخ الكود</button>
         </div>
       </div>
     </div>
   </div>
 
-  <script>
-    const PASSWORD = "joka2025";
+<script>
+const PASSWORD = "joka2025";
 
-    document.addEventListener("DOMContentLoaded", () => {
-      document.getElementById("login-btn").addEventListener("click", () => {
-        const pass = document.getElementById("password").value;
-        if (pass === PASSWORD) {
-          document.getElementById("login-area").classList.add("hidden");
-          document.getElementById("generator-area").classList.remove("hidden");
-        } else {
-          alert("❌ كلمة المرور غير صحيحة");
-        }
-      });
-
-      document.getElementById("verify-btn").addEventListener("click", () => {
-        const key = document.getElementById("apiKeyInput").value.trim();
-        if (!key) return alert("⚠️ أدخل كود صحيح");
-        fetchMatches("today");
-      });
-
-      document.getElementById("generate-btn").addEventListener("click", generateCode);
-    });
-
-    function generateCode() {
-      const map = {};
-      const checkboxes = document.querySelectorAll("input[type='checkbox']");
-
-      checkboxes.forEach(chk => {
-        const id = chk.id.replace("chk-", "");
-        const isChecked = chk.checked;
-        const linkInput = document.getElementById(`link-${id}`);
-        const value = isChecked ? (linkInput?.value.trim() || "#") : "--hide--";
-        map[id] = value;
-      });
-
-      const json = JSON.stringify(map);
-      const encoded = btoa(json);
-      const apiKey = document.getElementById("apiKeyInput").value.trim();
-
-      const final = [
-        "<JokaMatch>",
-        `<div day="today" theme="dark" flt="1" data-links="${encoded}" style="display:block;text-align:center;"></div>`,
-        "</JokaMatch>",
-        `<script src="https://eng3body0.github.io/DigitEgypt/tm.js" api-key="${apiKey}"><\/script>`
-      ].join("\n");
-
-      document.getElementById("finalCode").value = final;
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("login-btn").addEventListener("click", () => {
+    const pass = document.getElementById("password").value;
+    if (pass === PASSWORD) {
+      document.getElementById("login-area").classList.add("hidden");
+      document.getElementById("generator-area").classList.remove("hidden");
+    } else {
+      alert("❌ كلمة المرور غير صحيحة");
     }
+  });
 
-    function copyFinalCode() {
-      const code = document.getElementById("finalCode").value;
-      navigator.clipboard.writeText(code).then(() => {
-        alert("✅ تم نسخ الكود!");
-      });
-    }
+  document.getElementById("verify-btn").addEventListener("click", () => {
+    const key = document.getElementById("apiKeyInput").value.trim();
+    if (!key) return alert("⚠️ أدخل كود صحيح");
+    fetchMatches("today");
+  });
 
-    async function generateSignature(str) {
-      const buffer = new TextEncoder().encode(str);
-      const digest = await crypto.subtle.digest("SHA-256", buffer);
-      return [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2, "0")).join("");
-    }
+  document.getElementById("generate-btn").addEventListener("click", generateCode);
+});
 
-    async function fetchMatches(day) {
-      const SECRET = "NinJ0kaKey";
-      const ts = Math.floor(Date.now() / 1000);
-      const sig = await generateSignature(`${ts}:${SECRET}`);
-      const proxyUrl = `https://joka.ninjoka.workers.dev/?ts=${ts}&sig=${sig}&date=${encodeURIComponent(day)}`;
+function generateCode() {
+  const map = {};
+  document.querySelectorAll(".match-wrapper").forEach(wrapper => {
+    const id = wrapper.dataset.id;
+    const chk = document.getElementById(`chk-${id}`);
+    const input = document.getElementById(`link-${id}`);
+    map[id] = chk.checked ? (input.value.trim() || "#") : "--hide--";
+  });
 
-      try {
-        const res = await fetch(proxyUrl, {
-          headers: {
-            "X-From-Joka": "YES"
-          }
-        });
-        const rawText = await res.text();
-        const json = JSON.parse(rawText.replace(/^NinJoka\((.*)\)$/, "$1"));
-        if (!json.matches || !Array.isArray(json.matches)) {
-          throw new Error("❌ لا توجد مباريات");
-        }
-        renderMatches(json.matches);
-      } catch (e) {
-        alert("⚠️ حدث خطأ أثناء جلب المباريات");
-        console.error(e);
+  const json = JSON.stringify(map);
+  const encoded = btoa(json);
+  const apiKey = document.getElementById("apiKeyInput").value.trim();
+
+  const final = [
+    "<JokaMatch>",
+    `<div day="today" theme="dark" flt="1" data-links="${encoded}" style="display:block;text-align:center;"></div>`,
+    "</JokaMatch>",
+    `<script src="https://eng3body0.github.io/DigitEgypt/tm.js" api-key="${apiKey}"><\/script>`
+  ].join("\n");
+
+  document.getElementById("finalCode").value = final;
+}
+
+function copyFinalCode() {
+  navigator.clipboard.writeText(document.getElementById("finalCode").value).then(() => {
+    alert("✅ تم نسخ الكود!");
+  });
+}
+
+async function generateSignature(str) {
+  const buffer = new TextEncoder().encode(str);
+  const digest = await crypto.subtle.digest("SHA-256", buffer);
+  return [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+async function fetchMatches(day) {
+  const SECRET = "NinJ0kaKey";
+  const ts = Math.floor(Date.now() / 1000);
+  const sig = await generateSignature(`${ts}:${SECRET}`);
+  const proxyUrl = `https://joka.ninjoka.workers.dev/?ts=${ts}&sig=${sig}&date=${encodeURIComponent(day)}`;
+
+  try {
+    const res = await fetch(proxyUrl, {
+      headers: {
+        "X-From-Joka": "YES"
       }
-    }
+    });
+    const rawText = await res.text();
+    const json = JSON.parse(rawText.replace(/^NinJoka\((.*)\)$/, "$1"));
+    if (!json.matches || !Array.isArray(json.matches)) throw new Error("❌ لا توجد مباريات");
+    renderMatches(json.matches);
+  } catch (e) {
+    alert("⚠️ حدث خطأ أثناء جلب المباريات");
+    console.error(e);
+  }
+}
 
 function renderMatches(matches) {
   const list = document.getElementById("match-list");
@@ -176,35 +218,38 @@ function renderMatches(matches) {
 
   matches.forEach(match => {
     const matchId = match["Match-id"];
+    const cup = match["Cup-Name"] || "بطولة غير معروفة";
     const right = match["Team-Right"];
     const left = match["Team-Left"];
-    const cup = match["Cup-Name"] || "بطولة غير معروفة";
 
-    const row = document.createElement("div");
-    row.className = "match-row";
-    row.innerHTML = `
-      <div style="text-align:center; font-size:14px; font-weight:bold; margin-bottom:10px;">🏆 ${cup}</div>
-      <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
-        <div style="text-align:center;">
-          <img src="${right.Logo}" alt="${right.Name}" style="width:30px; height:30px;"><br>
-          <small>${right.Name}</small>
-        </div>
-        <div style="font-weight:bold;">X</div>
-        <div style="text-align:center;">
-          <img src="${left.Logo}" alt="${left.Name}" style="width:30px; height:30px;"><br>
-          <small>${left.Name}</small>
-        </div>
+    const wrapper = document.createElement("div");
+    wrapper.className = "match-wrapper";
+    wrapper.dataset.id = matchId;
+
+    wrapper.innerHTML = `
+      <div class="cup-title">🏆 ${cup}</div>
+      <div class="teams">
+        <div class="team"><img src="${right.Logo}"><span>${right.Name}</span></div>
+        <div class="match-center">X</div>
+        <div class="team"><span>${left.Name}</span><img src="${left.Logo}"></div>
       </div>
-      <div style="display:flex; align-items:center; justify-content:space-between; margin-top:10px;">
-        <input type="text" id="link-${matchId}" placeholder="رابط المباراة" disabled style="flex:1; margin-left:10px;">
-        <input type="checkbox" id="chk-${matchId}" onchange="document.getElementById('link-${matchId}').disabled = !this.checked">
+      <div class="match-checkbox">
+        <input type="checkbox" id="chk-${matchId}" onchange="toggleInput('${matchId}')">
+        <label for="chk-${matchId}">تفعيل</label>
+      </div>
+      <div class="control-bar hidden" id="card-${matchId}">
+        <input type="text" id="link-${matchId}" placeholder="رابط المباراة">
       </div>
     `;
-    list.appendChild(row);
+    list.appendChild(wrapper);
   });
 }
 
-
-  </script>
+function toggleInput(id) {
+  const inputBox = document.getElementById(`card-${id}`);
+  const chk = document.getElementById(`chk-${id}`);
+  inputBox.classList.toggle("hidden", !chk.checked);
+}
+</script>
 </body>
 </html>
