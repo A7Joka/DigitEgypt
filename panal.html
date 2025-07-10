@@ -17,14 +17,14 @@
       margin: auto;
     }
 
-    input, textarea, button {
+    input, textarea, button, select {
       font-family: inherit;
       border: none;
       border-radius: 8px;
       padding: 10px;
     }
 
-    input, textarea {
+    input, textarea, select {
       background: #1e2133;
       color: #fff;
     }
@@ -160,7 +160,7 @@
     </div>
 
     <div id="generator-area" class="hidden">
-      <input type="text" id="apiKeyInput" style="width:29%" placeholder="ادخل كود API Key">
+      <input type="text" id="apiKeyInput" style="width:28%" placeholder="ادخل كود API Key">
       <select id="flt" style="width:24%">
       <option value="1">Grouped</option>
       <option value="2">Categorized</option>
@@ -193,6 +193,7 @@
 <div id="matchCounter" style="margin-bottom: 12px; font-size: 14px;"></div>
 
         <h3>✅ حدد المباريات وضع الروابط:</h3>
+        <div id="counter" style="margin-bottom:10px;font-size:14px"></div>
         <div id="match-list"></div>
         <button id="generate-btn" style="width:100%">🎉 توليد الكود</button>
         <button onclick="resetAll()" style="width:100%;margin-top:10px;background:#ff5252">🔄 إعادة تعيين الكل</button>
