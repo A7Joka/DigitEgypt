@@ -823,7 +823,7 @@ const matchId = match["Match-id"]; const link = linksMap[matchId] || "#"; if (li
 globalMatchIndex++;
   return buildMatchCard(match, link);
 }).join("");
-          return <div class="match-section-title">${title}</div>${items};
+          return `<div class="match-section-title">${title}</div>${items}`;
         };
         div.innerHTML = "";
 div.style.opacity = 0;
