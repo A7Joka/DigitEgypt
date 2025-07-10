@@ -790,14 +790,10 @@ let globalMatchIndex = 0;
             live.sort((a, b) => (b["Time-Now"] || 0) - (a["Time-Now"] || 0));
             ended.sort((a, b) => new Date(b["Time-End"] || b["Time-Start"]) - new Date(a["Time-End"] || a["Time-Start"]));
 const section = sorted.map((match, index) => {
-  const link = linksMap?.[match["ID"]]; // أو Match-id حسب حالتك
-  if (link === "--hide--" || link === undefined) return "";
-  return buildMatchCard(match, link || "#");
+  const link = linksArray[globalMatchIndex] || "#";
+  globalMatchIndex++;
+  return buildMatchCard(match, link);
 }).join("");
-
-// 💡 لو القسم فاضي بعد التصفية، منظهرش اسم البطولة
-if (!section.trim()) return "";
-return <div class="match-section-title">${cup}</div>${section};
 
 
             return <div class="match-section-title">${cup}</div>${section};
