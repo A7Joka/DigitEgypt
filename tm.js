@@ -790,7 +790,7 @@ let globalMatchIndex = 0;
             live.sort((a, b) => (b["Time-Now"] || 0) - (a["Time-Now"] || 0));
             ended.sort((a, b) => new Date(b["Time-End"] || b["Time-Start"]) - new Date(a["Time-End"] || a["Time-Start"]));
 const section = sorted.map((match, index) => {
-  const link = linksArray[globalMatchIndex] || "#";
+const matchId = match["Match-id"]; const link = linksMap[matchId] || "#"; if (link === "--hide--") return ""; // لتجاهل المباراة
   globalMatchIndex++;
   return buildMatchCard(match, link);
 }).join("");
