@@ -116,23 +116,42 @@
         const encoded = btoa(json);
         const apiKey = document.getElementById("apiKeyInput").value.trim();
 
-const final = [
-  "<JokaMatch>",
-  `<div day="today" theme="dark" flt="1" data-links="${encoded}" style="display:block;text-align:center;"></div>`,
-  "</JokaMatch>",
-  `<script src="https://eng3body0.github.io/DigitEgypt/tm.js" api-key="${apiKey}"></script>`
-].join("\n");
+function generateCode() {
+  const map = {};
+  const checkboxes = document.querySelectorAll("input[type='checkbox']");
 
+  checkboxes.forEach(chk => {
+    const id = chk.id.replace("chk-", "");
+    if (chk.checked) {
+      const val = document.getElementById(`link-${id}`).value.trim();
+      map[id] = val || "#";
+    } else {
+      map[id] = "--hide--";
+    }
+  });
 
+  const json = JSON.stringify(map);
+  const encoded = btoa(json);
+  const apiKey = document.getElementById("apiKeyInput").value.trim();
 
-        document.getElementById("finalCode").value = final;
-      });
+  const final = [
+    "<JokaMatch>",
+    `<div day="today" theme="dark" flt="1" data-links="${encoded}" style="display:block;text-align:center;"></div>`,
+    "</JokaMatch>",
+    `<script src="https://eng3body0.github.io/DigitEgypt/tm.js" api-key="${apiKey}"></script>`
+  ].join("\n");
 
-      async function generateSignature(str) {
-        const buffer = new TextEncoder().encode(str);
-        const digest = await crypto.subtle.digest("SHA-256", buffer);
-        return [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2, "0")).join("");
-      }
+  const escaped = escapeHtml(final);
+  document.getElementById("finalCode").innerHTML = escaped;
+}
+function escapeHtml(str) {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
 
       async function fetchMatches(day) {
         const SECRET = "NinJ0kaKey";
