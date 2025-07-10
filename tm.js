@@ -760,7 +760,21 @@ let globalMatchIndex = 0;
   `;
   return;
 }
+const filteredMatches = matches.filter(match => {
+  const matchId = match["Match-id"];
+  const link = linksMap[matchId];
+  return link !== "--hide--"; // تجاهل المباراة إذا كانت مخفية
+});
 
+if (!filteredMatches.length) {
+  div.innerHTML = `
+    <div class="joka-no-matches">
+      <img src="https://cdn-icons-png.flaticon.com/512/7486/7486530.png" width="80" style="opacity: 0.5;" />
+      <p>لا توجد مباريات متاحة للعرض.</p>
+    </div>
+  `;
+  return;
+}
        if (flt === "1") {
           const grouped = {};
           matches.forEach(match => {
@@ -768,36 +782,46 @@ let globalMatchIndex = 0;
             if (!grouped[cup]) grouped[cup] = [];
             grouped[cup].push(match);
           });
-          const html = Object.entries(grouped).map(([cup, list]) => {
-            let matchIndex = 0; // نعد المباريات
+         const html = Object.entries(grouped).map(([cup, list]) => {
+  const visibleMatches = list.filter(match => {
+    const matchId = match["Match-id"];
+    const link = linksMap?.[matchId] ?? "#";
+    return link !== "--hide--";
+  });
 
-            const now = new Date();
-            const live = [], soon = [], future = [], ended = [];
+  if (!visibleMatches.length) return ""; // نتجاهل البطولة لو مفيهاش مباريات ظاهرين
 
-            list.forEach(match => {
-              const start = new Date(match["Time-Start"]);
-              const diffMin = Math.floor((start - now) / 60000);
-              const status = match["Match-Status"];
-              if (status.includes("جارية") || status.includes("شوط")) live.push(match);
-              else if (status.includes("انتهت")) ended.push(match);
-              else if (diffMin <= 60 && diffMin > 0) soon.push(match);
-              else future.push(match);
-            });
+  const now = new Date();
+  const live = [], soon = [], future = [], ended = [];
 
-            const sorted = [...live, ...soon, ...future, ...ended];
-            soon.sort((a, b) => new Date(a["Time-Start"]) - new Date(b["Time-Start"]));
-            future.sort((a, b) => new Date(a["Time-Start"]) - new Date(b["Time-Start"]));
-            live.sort((a, b) => (b["Time-Now"] || 0) - (a["Time-Now"] || 0));
-            ended.sort((a, b) => new Date(b["Time-End"] || b["Time-Start"]) - new Date(a["Time-End"] || a["Time-Start"]));
-const section = sorted.map((match, index) => {
-const matchId = match["Match-id"]; const link = linksMap[matchId] || "#"; if (link === "--hide--") return ""; // لتجاهل المباراة
-  globalMatchIndex++;
-  return buildMatchCard(match, link);
+  visibleMatches.forEach(match => {
+    const start = new Date(match["Time-Start"]);
+    const diffMin = Math.floor((start - now) / 60000);
+    const status = match["Match-Status"];
+    if (status.includes("جارية") || status.includes("شوط")) live.push(match);
+    else if (status.includes("انتهت")) ended.push(match);
+    else if (diffMin <= 60 && diffMin > 0) soon.push(match);
+    else future.push(match);
+  });
+
+  const sorted = [...live, ...soon, ...future, ...ended];
+
+  // الترتيب الداخلي
+  soon.sort((a, b) => new Date(a["Time-Start"]) - new Date(b["Time-Start"]));
+  future.sort((a, b) => new Date(a["Time-Start"]) - new Date(b["Time-Start"]));
+  live.sort((a, b) => (b["Time-Now"] || 0) - (a["Time-Now"] || 0));
+  ended.sort((a, b) => new Date(b["Time-End"] || b["Time-Start"]) - new Date(a["Time-End"] || a["Time-Start"]));
+
+  const section = sorted.map(match => {
+    const matchId = match["Match-id"];
+    const link = linksMap?.[matchId] ?? "#";
+    if (link === "--hide--") return "";
+    return buildMatchCard(match, link);
+  }).join("");
+
+  return `<div class="match-section-title">${cup}</div>${section}`;
 }).join("");
 
-
-            return `<div class="match-section-title">${cup}</div>${section}`;
-          }).join("");
 
           div.innerHTML = html;
           return;
