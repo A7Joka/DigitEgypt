@@ -470,6 +470,20 @@ function updateCounter() {
   const selected = document.querySelectorAll("input[type='checkbox']:checked").length;
   document.getElementById("counter").textContent = `✅ تم تحديد ${selected} من أصل ${total}`;
 }
+  function toggleDatePicker() {
+  const picker = document.getElementById("real-date-picker");
+  picker.style.display = picker.style.display === "none" || picker.style.display === "" ? "block" : "none";
+  picker.focus();
+}
+
+function handleDateChangeByPicker() {
+  const dateStr = document.getElementById("real-date-picker").value;
+  if (dateStr) {
+    currentDate = new Date(dateStr);
+    updateDateDisplay();
+    loadMatchesByDate();
+  }
+}
 </script>
 </body>
 </html>
