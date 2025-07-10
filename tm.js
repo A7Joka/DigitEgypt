@@ -828,10 +828,10 @@ globalMatchIndex++;
         div.innerHTML = "";
 div.style.opacity = 0;
 setTimeout(() => {
-        div.innerHTML = 
+        div.innerHTML = `
           ${renderSection("جارية الآن", live)}
           ${renderSection("المباريات القادمة", upcoming)}
-          ${renderSection("مباريات انتهت", ended)}
+          ${renderSection("مباريات انتهت", ended)}`
         ;
   div.style.transition = "opacity 0.5s ease";
   div.style.opacity = 1;
