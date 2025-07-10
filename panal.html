@@ -136,7 +136,18 @@
   font-size: 14px;
   color: #39DBBF;
 }
-
+.toast {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background: #333;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 6px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .toast.show { opacity: 1; }
   </style>
 </head>
 <body>
@@ -149,8 +160,16 @@
     </div>
 
     <div id="generator-area" class="hidden">
-      <input type="text" id="apiKeyInput" style="width:68%" placeholder="ادخل كود API Key">
-      <button id="verify-btn" style="width:29%">تحقق من الكود</button>
+      <input type="text" id="apiKeyInput" style="width:29%" placeholder="ادخل كود API Key">
+      <select id="flt" style="width:24%">
+      <option value="1">Grouped</option>
+      <option value="2">Categorized</option>
+    </select>
+    <select id="theme" style="width:24%">
+      <option value="dark">Dark</option>
+      <option value="light">Light</option>
+    </select>
+      <button id="verify-btn" style="width:20%">تحقق من الكود</button>
 
       <div id="matches-area" class="hidden">
         <div class="championship-wrap important-matches">
@@ -176,15 +195,17 @@
         <h3>✅ حدد المباريات وضع الروابط:</h3>
         <div id="match-list"></div>
         <button id="generate-btn" style="width:100%">🎉 توليد الكود</button>
+        <button onclick="resetAll()" style="width:100%;margin-top:10px;background:#ff5252">🔄 إعادة تعيين الكل</button>
+
 
         <div style="position: relative;">
           <textarea id="finalCode" style="width:97%" rows="6" readonly onclick="this.select();"></textarea>
-          <button onclick="copyFinalCode()" style="position:absolute; bottom:10px; left:10px;">📋 نسخ الكود</button>
+          <button onclick="copyCode()" style="position:absolute; bottom:10px; left:10px;">📋 نسخ الكود</button>
         </div>
       </div>
     </div>
   </div>
-
+<div class="toast" id="toast">تم نسخ الكود ✅</div>
 <script>
 const PASSWORD = "joka2025";
 
@@ -207,7 +228,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.getElementById("generate-btn").addEventListener("click", generateCode);
 });
-
+function resetAll() {
+  matches.forEach(match => {
+    const id = match["Match-id"];
+    document.getElementById(`chk-${id}`).checked = false;
+    toggleInput(id);
+  });
+  document.getElementById("finalCode").value = "";
+}
 function generateCode() {
   const map = {};
   document.querySelectorAll(".match-wrapper").forEach(wrapper => {
@@ -231,9 +259,12 @@ function generateCode() {
   document.getElementById("finalCode").value = final;
 }
 
-function copyFinalCode() {
-  navigator.clipboard.writeText(document.getElementById("finalCode").value).then(() => {
-    alert("✅ تم نسخ الكود!");
+function copyCode() {
+  const txt = document.getElementById("finalCode").value;
+  navigator.clipboard.writeText(txt).then(() => {
+    const toast = document.getElementById("toast");
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 2000);
   });
 }
 
@@ -266,7 +297,6 @@ async function fetchMatches(day) {
 }
 
 function renderMatches(matches) {
-  document.getElementById("matchCounter").textContent = `✅ تم عرض ${matches.length} مباراة`;
   const list = document.getElementById("match-list");
   list.innerHTML = "";
   document.getElementById("matches-area").classList.remove("hidden");
@@ -297,6 +327,7 @@ function renderMatches(matches) {
     `;
     list.appendChild(wrapper);
   });
+  updateCounter();
 }
 
 function toggleInput(id) {
@@ -349,7 +380,11 @@ document.getElementById("custom-date").addEventListener("change", e => {
 
 // أول مرة
 updateDateDisplay();
-
+function updateCounter() {
+  const total = matches.length;
+  const selected = document.querySelectorAll("input[type='checkbox']:checked").length;
+  document.getElementById("counter").textContent = `✅ تم تحديد ${selected} من أصل ${total}`;
+}
 </script>
 </body>
 </html>
