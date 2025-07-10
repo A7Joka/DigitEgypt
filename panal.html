@@ -11,86 +11,92 @@
       padding: 30px;
       direction: rtl;
     }
+
     .container {
       max-width: 800px;
       margin: auto;
     }
+
     input, textarea, button {
       font-family: inherit;
       border: none;
       border-radius: 8px;
       padding: 10px;
     }
+
     input, textarea {
       background: #1e2133;
       color: #fff;
     }
+
     button {
       background: #39DBBF;
       cursor: pointer;
       font-weight: bold;
     }
+
     .hidden {
       display: none;
     }
 
     .match-wrapper {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
       margin-bottom: 15px;
-      border: 1px solid #2e3247;
-      border-radius: 10px;
-      background: #1e2133;
-      padding: 10px;
-    }
-
-    .cup-title {
-      text-align: center;
-      font-weight: bold;
-      margin-bottom: 10px;
-      font-size: 14px;
-    }
-
-    .teams {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-
-    .team {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 13px;
-    }
-
-    .team img {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-    }
-
-    .match-center {
-      font-weight: bold;
-      font-size: 16px;
-    }
-
-    .control-bar {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 8px;
-    }
-
-    .control-bar input[type="text"] {
-      flex: 1;
     }
 
     .match-checkbox {
-      margin-top: 5px;
+      margin-top: 6px;
+    }
+
+    .inline-match-item {
+      flex: 1;
       display: flex;
       align-items: center;
-      gap: 5px;
+      justify-content: center;
+      flex-wrap: wrap;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid #2e3247;
+      border-radius: 10px;
+      padding: 12px;
+      color: var(--text, #BFC3D4);
+      position: relative;
+    }
+
+    .team-block {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .team-block img {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+    }
+
+    .match-x {
+      font-weight: bold;
+      font-size: 16px;
+      margin: 0 10px;
+    }
+
+    .cup-title {
+      width: 100%;
+      text-align: center;
+      font-size: 13px;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    .input-link {
+      width: 100%;
+      margin-top: 10px;
     }
 
     #finalCode {
@@ -110,18 +116,18 @@
     <h2>🎯 مولد كود JokaMatch</h2>
     
     <div id="login-area">
-      <input type="password" id="password" placeholder="ادخل كلمة المرور">
-      <button id="login-btn">تسجيل الدخول</button>
+      <input type="password" id="password" style="width:68%" placeholder="ادخل كلمة المرور">
+      <button id="login-btn" style="width:29%">تسجيل الدخول</button>
     </div>
 
     <div id="generator-area" class="hidden">
-      <input type="text" id="apiKeyInput" placeholder="ادخل كود API Key">
-      <button id="verify-btn">تحقق من الكود</button>
+      <input type="text" id="apiKeyInput" style="width:68%" placeholder="ادخل كود API Key">
+      <button id="verify-btn" style="width:29%">تحقق من الكود</button>
 
       <div id="matches-area" class="hidden">
         <h3>✅ حدد المباريات وضع الروابط:</h3>
         <div id="match-list"></div>
-        <button id="generate-btn">🎉 توليد الكود</button>
+        <button id="generate-btn" style="width:100%">🎉 توليد الكود</button>
 
         <div style="position: relative;">
           <textarea id="finalCode" rows="6" readonly onclick="this.select();"></textarea>
@@ -227,18 +233,17 @@ function renderMatches(matches) {
     wrapper.dataset.id = matchId;
 
     wrapper.innerHTML = `
-      <div class="cup-title">🏆 ${cup}</div>
-      <div class="teams">
-        <div class="team"><img src="${right.Logo}"><span>${right.Name}</span></div>
-        <div class="match-center">X</div>
-        <div class="team"><span>${left.Name}</span><img src="${left.Logo}"></div>
-      </div>
       <div class="match-checkbox">
         <input type="checkbox" id="chk-${matchId}" onchange="toggleInput('${matchId}')">
-        <label for="chk-${matchId}">تفعيل</label>
       </div>
-      <div class="control-bar hidden" id="card-${matchId}">
-        <input type="text" id="link-${matchId}" placeholder="رابط المباراة">
+      <div class="inline-match-item">
+        <div class="cup-title">🏆 ${cup}</div>
+        <div class="team-block"><img src="${right.Logo}"><span>${right.Name}</span></div>
+        <div class="match-x">X</div>
+        <div class="team-block"><span>${left.Name}</span><img src="${left.Logo}"></div>
+        <div class="input-link hidden" id="card-${matchId}">
+          <input type="text" id="link-${matchId}" placeholder="رابط المباراة">
+        </div>
       </div>
     `;
     list.appendChild(wrapper);
