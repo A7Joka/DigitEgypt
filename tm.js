@@ -732,8 +732,15 @@ div.style.setProperty('--progress-track', theme === "dark" ? '#333' : '#ccc');
 div.style.setProperty('--progress-color', theme === "dark" ? '#39DBBF' : '#007acc');
       div.style.setProperty('--result-bg', theme === "dark" ? '#191D2D' : '#ddd');
       div.style.setProperty('--text', theme === "dark" ? '#BFC3D4' : '#222');
-const linksAttr = div.getAttribute("link") || "";
-const linksArray = linksAttr.split(",").map(l => l.trim());
+let linksMap = {};
+const linksEncoded = div.getAttribute("data-links");
+try {
+  const decoded = atob(linksEncoded || "");
+  linksMap = JSON.parse(decoded);
+} catch (e) {
+  console.warn("❌ Failed to parse match links map.");
+}
+
 let globalMatchIndex = 0;
       try {
         div.innerHTML = `
@@ -783,7 +790,7 @@ let globalMatchIndex = 0;
             live.sort((a, b) => (b["Time-Now"] || 0) - (a["Time-Now"] || 0));
             ended.sort((a, b) => new Date(b["Time-End"] || b["Time-Start"]) - new Date(a["Time-End"] || a["Time-Start"]));
             const section = sorted.map((match, index) => {
-const link = linksArray[globalMatchIndex] || "#";
+const matchId = match["Match-id"]; const link = linksMap[matchId] || "#"; if (link === "--hide--") return ""; // لتجاهل المباراة
               globalMatchIndex++;
   return buildMatchCard(match, link);
 }).join("");
@@ -811,7 +818,7 @@ ended.sort((a, b) => new Date(b["Time-End"] || b["Time-Start"]) - new Date(a["Ti
         const renderSection = (title, list) => {
           if (!list.length) return "";
 const items = list.map((match, index) => {
-const link = linksArray[globalMatchIndex] || "#";
+const matchId = match["Match-id"]; const link = linksMap[matchId] || "#"; if (link === "--hide--") return ""; // لتجاهل المباراة
 globalMatchIndex++;
   return buildMatchCard(match, link);
 }).join("");
