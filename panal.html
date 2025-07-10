@@ -116,11 +116,14 @@
         const encoded = btoa(json);
         const apiKey = document.getElementById("apiKeyInput").value.trim();
 
-        const final = `
-<JokaMatch>
-  <div day="today" theme="dark" flt="1" data-links="${encoded}" style="display:block;text-align:center;"></div>
-</JokaMatch>
-<script src="https://eng3body0.github.io/DigitEgypt/tm.js" api-key="${apiKey}"></script>`.trim();
+const final = [
+  "<JokaMatch>",
+  `<div day="today" theme="dark" flt="1" data-links="${encoded}" style="display:block;text-align:center;"></div>`,
+  "</JokaMatch>",
+  `<script src="https://eng3body0.github.io/DigitEgypt/tm.js" api-key="${apiKey}"></script>`
+].join("\n");
+
+
 
         document.getElementById("finalCode").value = final;
       });
