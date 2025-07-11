@@ -143,7 +143,7 @@
       background: #333;
       color: #fff;
       padding: 10px 20px;
-      border-radius: 6px;
+      border-radius: 8px;
       opacity: 0;
       transition: opacity 0.3s ease;
     }
@@ -236,20 +236,94 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
       }
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Tajawal:wght@400;700&display=swap');
+
+.login-form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #151825;
+  font-family: 'Tajawal', 'Cairo', sans-serif;
+}
+
+.login-card {
+  background: #1e2133;
+  padding: 30px 25px;
+  border-radius: 12px;
+  box-shadow: 0 0 12px #0a0d3722;
+  max-width: 350px;
+  width: 100%;
+  text-align: center;
+  color: #fff;
+}
+
+.login-card input {
+  width: 100%;
+  padding: 14px 12px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  background: #151825;
+  border: 2px solid #2e3247;
+  color: #fff;
+  font-size: 14px;
+}
+
+.login-card input:focus {
+  border-color: #39DBBF;
+  outline: none;
+}
+
+.login-btn {
+  background-color: #39DBBF;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 16px;
+  width: 100%;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.login-btn:hover {
+  background-color: #2cc3a5;
+}
+
+.login-help {
+  margin-top: 15px;
+  font-size: 13px;
+  opacity: 0.8;
+  line-height: 1.6;
+}
+
+.login-help a {
+  color: #39DBBF;
+  text-decoration: none;
+  font-weight: bold;
+}
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>🛠️ أداة توليد كود JokaMatch</h2>
-    
-    <div id="login-area">
-      <input type="email" id="loginEmail" placeholder="البريد الإلكتروني">
-      <input type="password" id="loginPassword" placeholder="كلمة المرور">
-      <button onclick="login()">تسجيل الدخول</button>
+<div id="login-area" class="hidden login-form-container">
+  <div class="login-card">
+    <h2 style="margin-bottom: 20px;">🛠️ أداة توليد كود JokaMatch</h2>
+    <form class="FormLog" onsubmit="event.preventDefault(); login();">
+      <input class="Email" type="text" id="loginEmail" placeholder="Email@gmail.com" required>
+      <input class="Password" type="password" id="loginPassword" placeholder="Password" required>
+      <button type="submit" class="login-btn">🔐 تسجيل الدخول</button>
+    </form>
+    <div class="login-help">
+      <p>إذا كنت عميلاً لدينا، تواصل معنا للحصول على معلومات الدخول.</p>
+      <a href="https://wa.me/+201030588214" target="_blank" rel="nofollow noopener">💬 تواصل عبر واتساب</a>
     </div>
+  </div>
+</div>
 
     <div id="generator-area" class="hidden">
-      <input type="text" id="apiKeyInput" style="width:28%" placeholder="ادخل كود API Key">
+      <h2>🛠️ أداة توليد كود JokaMatch</h2>
+      <input type="text" id="apiKeyInput" style="width:48%" placeholder="API Key">
       <select id="flt" style="width:24%">
       <option value="1">Grouped</option>
       <option value="2">Categorized</option>
@@ -258,7 +332,6 @@
       <option value="dark">Dark</option>
       <option value="light">Light</option>
     </select>
-      <button id="verify-btn" style="width:20%">تحقق من الكود</button>
 
       <div id="matches-area" class="hidden">
 <div class="section-title">
@@ -309,34 +382,40 @@
       </div>
     </div>
   </div>
-<div class="toast" id="toast">تم نسخ الكود ✅</div>
+<div class="toast" id="toast"></div>
   <script>
-async function login() {
+function showToast(msg) { 
+  const toast = document.getElementById("toast"); 
+  toast.textContent = msg; 
+  toast.classList.add("show"); 
+  setTimeout(() => toast.classList.remove("show"),2500);
+}
+async function login() { 
   const email = document.getElementById("loginEmail").value.trim().toLowerCase();
-  const pass = document.getElementById("loginPassword").value.trim();
-
-  // جلب الملف المشفر
-  const res = await fetch("https://eng3body0.github.io/DigitEgypt/users.js");
-  const encoded = await res.text();
-
-  const decoded = atob(encoded); // فك تشفير Base64
-  const users = JSON.parse(decoded);
-
-  const user = users.find(u => u.email === email && u.password === pass);
-
-  if (!user) {
-    alert("❌ بيانات الدخول غير صحيحة");
-    return;
-  }
-
-  // ✅ دخول ناجح
-  document.getElementById("generator-area").classList.remove("hidden");
+  const pass = document.getElementById("loginPassword").value.trim(); 
+  const btn = document.querySelector(".loginform-btn");
+if (!email || !pass) {
+  showToast("📛 أدخل البريد وكلمة المرور");
+  return; 
+}
+  try { 
+    const res = await fetch("https://eng3body0.github.io/DigitEgypt/users.js"); 
+    const encoded = await res.text(); 
+    const decoded = atob(encoded); 
+    const users = JSON.parse(decoded);
+    const user = users.find(u => u.email === email && u.password === pass);
+if (!user) {
+  showToast("❌ بيانات الدخول غير صحيحة");
+} else {
+  // ✅ تسجيل دخول ناجح
   document.getElementById("login-area").classList.add("hidden");
-
-  // إدخال كود الـ API تلقائي
+  document.getElementById("generator-area").classList.remove("hidden");
   document.getElementById("apiKeyInput").value = user.apiKey;
   fetchMatches("today");
 }
+
+} catch (e) { console.error(e); showToast("⚠️ حدث خطأ أثناء التحقق"); }
+// استعادة حالة الزر بعد 3 ثوانٍ 
 function resetAll() {
   matches.forEach(match => {
     const id = match["Match-id"];
@@ -373,12 +452,9 @@ function generateCode() {
 function copyCode() {
   const txt = document.getElementById("finalCode").value;
   navigator.clipboard.writeText(txt).then(() => {
-    const toast = document.getElementById("toast");
-    toast.classList.add("show");
-    setTimeout(() => toast.classList.remove("show"), 2000);
+    showToast("تم نسخ الكود ✅");
   });
 }
-
 async function generateSignature(str) {
   const buffer = new TextEncoder().encode(str);
   const digest = await crypto.subtle.digest("SHA-256", buffer);
