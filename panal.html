@@ -393,7 +393,48 @@ function showToast(msg) {
   toast.classList.add("show");
   setTimeout(() => toast.classList.remove("show"), 2500);
 }
+async function generateSignature(str) {
+  const buffer = new TextEncoder().encode(str);
+  const digest = await crypto.subtle.digest("SHA-256", buffer);
+  return [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2, "0")).join("");
+}
 
+let isFetching = false;
+
+async function fetchMatches(day) {
+  if (isFetching) return;
+  isFetching = true;
+const loading = document.getElementById("loading-overlay");
+  loading.style.display = "flex"; 
+  const SECRET = "NinJ0kaKey";
+  const ts = Math.floor(Date.now() / 1000);
+  const sig = await generateSignature(`${ts}:${SECRET}`);
+  const proxyUrl = `https://joka.ninjoka.workers.dev/?ts=${ts}&sig=${sig}&date=${encodeURIComponent(day)}`;
+
+  try {
+    const res = await fetch(proxyUrl, {
+      headers: { "X-From-Joka": "YES" }
+    });
+    const rawText = await res.text();
+
+    if (!rawText.startsWith("NinJoka(")) {
+      showToast("⛔ الرد غير مصرح به أو التوقيع مكرر\n\n" + rawText);
+      throw new Error("⛔ الرد غير متوقع");
+    }
+
+    const json = JSON.parse(rawText.replace(/^NinJoka\((.*)\)$/, "$1"));
+    if (!json.matches || !Array.isArray(json.matches)) throw new Error("❌ لا توجد مباريات");
+
+    matches = json.matches;
+    renderMatches(matches);
+  } catch (e) {
+    showToast("⚠️ حدث خطأ أثناء جلب المباريات");
+    console.error(e);
+  } finally {
+    isFetching = false;
+    loading.style.display = "none";
+  }
+  }
 async function login() {
   const email = document.getElementById("loginEmail").value.trim().toLowerCase();
   const pass = document.getElementById("loginPassword").value.trim();
@@ -468,49 +509,6 @@ function copyCode() {
   navigator.clipboard.writeText(txt).then(() => {
     showToast("تم نسخ الكود ✅");
   });
-
-async function generateSignature(str) {
-  const buffer = new TextEncoder().encode(str);
-  const digest = await crypto.subtle.digest("SHA-256", buffer);
-  return [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2, "0")).join("");
-}
-
-let isFetching = false;
-
-async function fetchMatches(day) {
-  if (isFetching) return;
-  isFetching = true;
-const loading = document.getElementById("loading-overlay");
-  loading.style.display = "flex"; 
-  const SECRET = "NinJ0kaKey";
-  const ts = Math.floor(Date.now() / 1000);
-  const sig = await generateSignature(`${ts}:${SECRET}`);
-  const proxyUrl = `https://joka.ninjoka.workers.dev/?ts=${ts}&sig=${sig}&date=${encodeURIComponent(day)}`;
-
-  try {
-    const res = await fetch(proxyUrl, {
-      headers: { "X-From-Joka": "YES" }
-    });
-    const rawText = await res.text();
-
-    if (!rawText.startsWith("NinJoka(")) {
-      alert("⛔ الرد غير مصرح به أو التوقيع مكرر\n\n" + rawText);
-      throw new Error("⛔ الرد غير متوقع");
-    }
-
-    const json = JSON.parse(rawText.replace(/^NinJoka\((.*)\)$/, "$1"));
-    if (!json.matches || !Array.isArray(json.matches)) throw new Error("❌ لا توجد مباريات");
-
-    matches = json.matches;
-    renderMatches(matches);
-  } catch (e) {
-    alert("⚠️ حدث خطأ أثناء جلب المباريات");
-    console.error(e);
-  } finally {
-    isFetching = false;
-    loading.style.display = "none";
-  }
-  }
 function renderMatches(matches) {
   const list = document.getElementById("match-list");
   list.innerHTML = "";
