@@ -306,12 +306,12 @@
 </head>
 <body>
   <div class="container">
-<div id="login-area" class="hidden login-form-container">
+<div id="login-area" class="login-form-container">
   <div class="login-card">
     <h2 style="margin-bottom: 20px;">🛠️ أداة توليد كود JokaMatch</h2>
     <div>
-      <input class="Email" type="text" id="loginEmail" placeholder="Email@gmail.com" required>
-      <input class="Password" type="password" id="loginPassword" placeholder="Password" required>
+      <input class="Email" type="text" id="loginEmail" placeholder="Email@gmail.com">
+      <input class="Password" type="password" id="loginPassword" placeholder="Password">
       <button onclick="login()" class="login-btn">🔐 تسجيل الدخول</button>
     </div>
     <div class="login-help">
@@ -387,8 +387,6 @@
 </div>
 <div class="toast" id="toast"></div>
   <script>
-let matches = [];
-
 function showToast(msg) {
   const toast = document.getElementById("toast");
   toast.textContent = msg;
