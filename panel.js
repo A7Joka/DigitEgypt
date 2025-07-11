@@ -148,7 +148,7 @@ function generateCode() {
 
   const final = 
     "<JokaMatch>",
-    `<div day="${day}" theme="${theme}" flt="${flt}" data-links="${encoded}" style="display:block;text-align:center;"></div>`,
+    `<div day="today" theme="${theme}" flt="${flt}" data-links="${encoded}" style="display:block;text-align:center;"></div>`,
     "</JokaMatch>",
     `<script src="https://eng3body0.github.io/DigitEgypt/tm.js" api-key="${apiKey}"><\/script>`
   ].join("\n");
