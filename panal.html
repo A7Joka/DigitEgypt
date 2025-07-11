@@ -395,13 +395,6 @@ function showToast(msg) {
   setTimeout(() => toast.classList.remove("show"), 2500);
 }
     let currentDate = new Date();
-updateDateDisplay();
-function updateCounter() {
-  const total = matches.length;
-  const selected = document.querySelectorAll("input[type='checkbox']:checked").length;
-  document.getElementById("counter").textContent = `✅ تم تحديد ${selected} من أصل ${total}`;
-}
-
 function updateDateDisplay() {
   const options = { day: "numeric", month: "long", year: "numeric" };
   document.getElementById("displayed-date").textContent = currentDate.toLocaleDateString("ar-EG", options);
@@ -551,7 +544,12 @@ function generateCode() {
 
   document.getElementById("finalCode").value = final;
 }
-
+updateDateDisplay();
+function updateCounter() {
+  const total = matches.length;
+  const selected = document.querySelectorAll("input[type='checkbox']:checked").length;
+  document.getElementById("counter").textContent = `✅ تم تحديد ${selected} من أصل ${total}`;
+}
 function copyCode() {
   const txt = document.getElementById("finalCode").value;
   navigator.clipboard.writeText(txt).then(() => {
@@ -563,6 +561,7 @@ function toggleInput(id) {
   inputBox.classList.toggle("hidden", !chk.checked);
     updateCounter();
 }
+  
 function loadMatchesByDate() {
   const formatted = currentDate.toISOString().split("T")[0];
   fetchMatches(formatted);
