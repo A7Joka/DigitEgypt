@@ -178,7 +178,7 @@ function copyCode() {
   navigator.clipboard.writeText(txt).then(() => {
     showToast("تم نسخ الكود ✅");
   });
-  
+}
 function loadMatchesByDate() {
   const formatted = currentDate.toISOString().split("T")[0];
   fetchMatches(formatted);
