@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+f<!DOCTYPE html>
 <html lang="ar">
 <head>
   <meta charset="UTF-8" />
@@ -394,6 +394,39 @@ function showToast(msg) {
   toast.classList.add("show");
   setTimeout(() => toast.classList.remove("show"), 2500);
 }
+    function renderMatches(matches) {
+  const list = document.getElementById("match-list");
+  list.innerHTML = "";
+  document.getElementById("matches-area").classList.remove("hidden");
+
+  matches.forEach(match => {
+    const matchId = match["Match-id"];
+    const cup = match["Cup-Name"] || "بطولة غير معروفة";
+    const right = match["Team-Right"];
+    const left = match["Team-Left"];
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "match-wrapper";
+    wrapper.dataset.id = matchId;
+
+    wrapper.innerHTML = `
+      <div class="match-checkbox">
+        <input type="checkbox" id="chk-${matchId}" onchange="toggleInput('${matchId}')">
+      </div>
+      <div class="inline-match-item">
+        <div class="cup-title">🏆 ${cup}</div>
+        <div class="team-block"><img src="${right.Logo}"><span>${right.Name}</span></div>
+        <div class="match-x">X</div>
+        <div class="team-block"><span>${left.Name}</span><img src="${left.Logo}"></div>
+        <div class="input-link hidden" id="card-${matchId}">
+          <input type="text" style="width:97%" id="link-${matchId}" placeholder="رابط المباراة">
+        </div>
+      </div>
+    `;
+    list.appendChild(wrapper);
+  });
+  updateCounter();
+}
 async function generateSignature(str) {
   const buffer = new TextEncoder().encode(str);
   const digest = await crypto.subtle.digest("SHA-256", buffer);
@@ -510,40 +543,6 @@ function copyCode() {
   navigator.clipboard.writeText(txt).then(() => {
     showToast("تم نسخ الكود ✅");
   });
-function renderMatches(matches) {
-  const list = document.getElementById("match-list");
-  list.innerHTML = "";
-  document.getElementById("matches-area").classList.remove("hidden");
-
-  matches.forEach(match => {
-    const matchId = match["Match-id"];
-    const cup = match["Cup-Name"] || "بطولة غير معروفة";
-    const right = match["Team-Right"];
-    const left = match["Team-Left"];
-
-    const wrapper = document.createElement("div");
-    wrapper.className = "match-wrapper";
-    wrapper.dataset.id = matchId;
-
-    wrapper.innerHTML = `
-      <div class="match-checkbox">
-        <input type="checkbox" id="chk-${matchId}" onchange="toggleInput('${matchId}')">
-      </div>
-      <div class="inline-match-item">
-        <div class="cup-title">🏆 ${cup}</div>
-        <div class="team-block"><img src="${right.Logo}"><span>${right.Name}</span></div>
-        <div class="match-x">X</div>
-        <div class="team-block"><span>${left.Name}</span><img src="${left.Logo}"></div>
-        <div class="input-link hidden" id="card-${matchId}">
-          <input type="text" style="width:97%" id="link-${matchId}" placeholder="رابط المباراة">
-        </div>
-      </div>
-    `;
-    list.appendChild(wrapper);
-  });
-  updateCounter();
-}
-
 function toggleInput(id) {
   const inputBox = document.getElementById(`card-${id}`);
   const chk = document.getElementById(`chk-${id}`);
