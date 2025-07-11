@@ -384,12 +384,7 @@
   </div>
 <div class="toast" id="toast"></div>
   <script>
-function showToast(msg) { 
-  const toast = document.getElementById("toast"); 
-  toast.textContent = msg; 
-  toast.classList.add("show"); 
-  setTimeout(() => toast.classList.remove("show"),2500);
-}
+
 async function login() { 
   const email = document.getElementById("loginEmail").value.trim().toLowerCase();
   const pass = document.getElementById("loginPassword").value.trim(); 
@@ -415,6 +410,12 @@ if (!user) {
 }
 
 } catch (e) { console.error(e); showToast("⚠️ حدث خطأ أثناء التحقق"); }
+  function showToast(msg) { 
+  const toast = document.getElementById("toast"); 
+  toast.textContent = msg; 
+  toast.classList.add("show"); 
+  setTimeout(() => toast.classList.remove("show"),2500);
+}
 // استعادة حالة الزر بعد 3 ثوانٍ 
 function resetAll() {
   matches.forEach(match => {
