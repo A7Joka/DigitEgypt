@@ -145,8 +145,6 @@ function generateCode() {
   const apiKey = document.getElementById("apiKeyInput").value.trim();
   const flt = document.getElementById("flt").value;
   const theme = document.getElementById("theme").value;
-  const day =  document.getElementById("real-date-picker").value;
-
 
   const final = 
     "<JokaMatch>",
