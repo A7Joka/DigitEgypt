@@ -144,11 +144,12 @@ function generateCode() {
   const encoded = btoa(json);
   const apiKey = document.getElementById("apiKeyInput").value.trim();
   const flt = document.getElementById("flt").value;
-  const theme = document.getElementById("theme").value;
-
+  const theme = document.getElementById("theme").value
+  const day = document.getElementById("displayed-date").dataset.date;
+  
   const final = 
     "<JokaMatch>",
-    `<div day="today" theme="${theme}" flt="${flt}" data-links="${encoded}" style="display:block;text-align:center;"></div>`,
+    `<div day="${day}" theme="${theme}" flt="${flt}" data-links="${encoded}" style="display:block;text-align:center;"></div>`,
     "</JokaMatch>",
     `<script src="https://eng3body0.github.io/DigitEgypt/tm.js" api-key="${apiKey}"><\/script>`
   ].join("\n");
@@ -184,7 +185,7 @@ function loadMatchesByDate() {
   fetchMatches(formatted);
 }
 
-function handleDateChangeByPicker() {
+function handleDateChangeByPicker() 
   const picker = document.getElementById("real-date-picker");
   const val = picker.value;
   if (val) {
