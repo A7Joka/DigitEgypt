@@ -309,11 +309,11 @@
 <div id="login-area" class="hidden login-form-container">
   <div class="login-card">
     <h2 style="margin-bottom: 20px;">🛠️ أداة توليد كود JokaMatch</h2>
-    <form class="FormLog" onsubmit="event.preventDefault(); login();">
+    <div class="FormLog">
       <input class="Email" type="text" id="loginEmail" placeholder="Email@gmail.com" required>
       <input class="Password" type="password" id="loginPassword" placeholder="Password" required>
-      <button type="submit" class="login-btn">🔐 تسجيل الدخول</button>
-    </form>
+      <button onclick="login()" class="login-btn">🔐 تسجيل الدخول</button>
+    </div>
     <div class="login-help">
       <p>إذا كنت عميلاً لدينا، تواصل معنا للحصول على معلومات الدخول.</p>
       <a href="https://wa.me/+201030588214" target="_blank" rel="nofollow noopener">💬 تواصل عبر واتساب</a>
@@ -384,37 +384,49 @@
   </div>
 <div class="toast" id="toast"></div>
   <script>
+let matches = [];
 
-async function login() { 
+function showToast(msg) {
+  const toast = document.getElementById("toast");
+  toast.textContent = msg;
+  toast.classList.add("show");
+  setTimeout(() => toast.classList.remove("show"), 2500);
+}
+
+async function login() {
   const email = document.getElementById("loginEmail").value.trim().toLowerCase();
-  const pass = document.getElementById("loginPassword").value.trim(); 
-  const btn = document.querySelector(".loginform-btn");
-if (!email || !pass) {
-  showToast("📛 أدخل البريد وكلمة المرور");
-  return; 
-}
-  try { 
-    const res = await fetch("https://eng3body0.github.io/DigitEgypt/users.js"); 
-    const encoded = await res.text(); 
-    const decoded = atob(encoded); 
-    const users = JSON.parse(decoded);
-    const user = users.find(u => u.email === email && u.password === pass);
-if (!user) {
-  showToast("❌ بيانات الدخول غير صحيحة");
-} else {
-  // ✅ تسجيل دخول ناجح
-  document.getElementById("login-area").classList.add("hidden");
-  document.getElementById("generator-area").classList.remove("hidden");
-  document.getElementById("apiKeyInput").value = user.apiKey;
-  fetchMatches("today");
-}
+  const pass = document.getElementById("loginPassword").value.trim();
+  const btn = document.querySelector(".login-btn");
 
-} catch (e) { console.error(e); showToast("⚠️ حدث خطأ أثناء التحقق"); }
-  function showToast(msg) { 
-  const toast = document.getElementById("toast"); 
-  toast.textContent = msg; 
-  toast.classList.add("show"); 
-  setTimeout(() => toast.classList.remove("show"),2500);
+  if (!email || !pass) return showToast("📛 أدخل البريد وكلمة المرور");
+
+  btn.disabled = true;
+  btn.textContent = "⏳ جاري التحقق...";
+
+  try {
+    const res = await fetch("https://eng3body0.github.io/DigitEgypt/users.js");
+    const encoded = await res.text();
+    const decoded = atob(encoded);
+    const users = JSON.parse(decoded);
+
+    const user = users.find(u => u.email === email && u.password === pass);
+    if (!user) {
+      showToast("❌ بيانات الدخول غير صحيحة");
+    } else {
+      document.getElementById("login-area").classList.add("hidden");
+      document.getElementById("generator-area").classList.remove("hidden");
+      document.getElementById("apiKeyInput").value = user.apiKey;
+      fetchMatches("today");
+    }
+  } catch (e) {
+    console.error(e);
+    showToast("⚠️ حدث خطأ أثناء التحقق");
+  } finally {
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = "🔐 تسجيل الدخول";
+    }, 3000);
+  }
 }
 // استعادة حالة الزر بعد 3 ثوانٍ 
 function resetAll() {
@@ -455,7 +467,7 @@ function copyCode() {
   navigator.clipboard.writeText(txt).then(() => {
     showToast("تم نسخ الكود ✅");
   });
-}
+
 async function generateSignature(str) {
   const buffer = new TextEncoder().encode(str);
   const digest = await crypto.subtle.digest("SHA-256", buffer);
@@ -571,14 +583,6 @@ function handleDateChangeByPicker() {
   const val = picker.value;
   if (val) {
     currentDate = new Date(val);
-    updateDateDisplay();
-    loadMatchesByDate();
-  }
-}
-function handleDateChangeByPicker() {
-  const dateStr = document.getElementById("real-date-picker").value;
-  if (dateStr) {
-    currentDate = new Date(dateStr);
     updateDateDisplay();
     loadMatchesByDate();
   }
