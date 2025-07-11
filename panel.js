@@ -145,10 +145,12 @@ function generateCode() {
   const apiKey = document.getElementById("apiKeyInput").value.trim();
   const flt = document.getElementById("flt").value;
   const theme = document.getElementById("theme").value;
+  const day =  document.getElementById("real-date-picker").value;
 
-  const final = [
+
+  const final = 
     "<JokaMatch>",
-    `<div day="today" theme="${theme}" flt="${flt}" data-links="${encoded}" style="display:block;text-align:center;"></div>`,
+    `<div day="${day}" theme="${theme}" flt="${flt}" data-links="${encoded}" style="display:block;text-align:center;"></div>`,
     "</JokaMatch>",
     `<script src="https://eng3body0.github.io/DigitEgypt/tm.js" api-key="${apiKey}"><\/script>`
   ].join("\n");
