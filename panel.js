@@ -147,7 +147,7 @@ function generateCode() {
   const theme = document.getElementById("theme").value
   const date = document.getElementById("displayed-date").dataset.date;
   
-  const final = 
+  const final = [
     "<JokaMatch>",
     `<div day="${date}" theme="${theme}" flt="${flt}" data-links="${encoded}" style="display:block;text-align:center;"></div>`,
     "</JokaMatch>",
