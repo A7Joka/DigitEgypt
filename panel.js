@@ -98,7 +98,7 @@ async function login() {
   btn.textContent = "⏳ جاري التحقق...";
 
   try {
-    const res = await fetch("https://eng3body0.github.io/DigitEgypt/users.js");
+    const res = await fetch("https://a7joka.github.io/DigitEgypt/users.js");
     const encoded = await res.text();
     const decoded = atob(encoded);
     const users = JSON.parse(decoded);
