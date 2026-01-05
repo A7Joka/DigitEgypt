@@ -166,404 +166,143 @@ async function fetchMatches(day) {
 }
 
 
-  const style = document.createElement("style");
+const style = document.createElement("style");
   style.innerHTML = `
-    /* === Joka Match Global Styles === */
+    /* === Joka Match Global Styles (Modified for JokaSport) === */
+    JokaMatch {
+      display: block;
+      text-align: center;
+      font-family: 'Tajawal', sans-serif; /* تم تغيير الخط ليناسب القالب */
+      margin-top: 10px;
+    }
+    .joka-loader {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 0;
+    }
+    /* استخدام لون القالب الأساسي */
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid var(--primary, #d32f2f); 
+      border-top: 4px solid transparent;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 10px;
+    }
+    .joka-loader-text {
+      color: var(--text-light, #333);
+      font-size: 14px;
+      font-weight: bold;
+    }
+    /* دعم الوضع الليلي عبر متغيرات القالب */
+    [data-theme="dark"] .joka-loader-text { color: var(--text-dark, #e0e0e0); }
+    
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-JokaMatch {
-  display: block;
-  text-align: center;
-  font-family: 'Cairo', sans-serif;
-}
-.joka-loader {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 0;
-}
-.spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #39dbbf;
-  border-top: 4px solid transparent;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  margin-bottom: 10px;
-}
-.joka-loader-text {
-  color: var(--text, #bfc3d4);
-  font-size: 14px;
-  font-weight: bold;
-  animation: fadeIn 1s ease-in-out infinite alternate;
-}
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-@keyframes fadeIn {
-  from { opacity: 0.4; }
-  to { opacity: 1; }
-}
-.joka-no-matches {
-  padding: 40px 0;
-  text-align: center;
-  color: var(--text, #bfc3d4);
-  font-size: 14px;
-  opacity: 0.8;
-}
-.joka-error {
-  text-align: center;
-  padding: 50px 20px;
-  color: var(--text, #bfc3d4);
-}
+    .joka-no-matches {
+      padding: 40px 0;
+      text-align: center;
+      color: var(--text-light);
+      font-size: 14px;
+      opacity: 0.8;
+    }
+    [data-theme="dark"] .joka-no-matches { color: var(--text-dark); }
 
-/* === Inline Match Item === */
-.inline-match-item {
-  display: flex;
-  align-items: center;
-  min-height: 60px;
-  border-radius: 10px;
-  background: var(--bg, #151825);
-  margin-bottom: 5px;
-  justify-content: center;
-  padding: 18px;
-  position: relative;
-  flex-wrap: wrap;
-  color: var(--text, #BFC3D4);
-}
+    /* === تصميم الكارت === */
+    .inline-match-item {
+      display: flex;
+      align-items: center;
+      min-height: 60px;
+      border-radius: 10px;
+      background: var(--card-light, #fff); /* خلفية من القالب */
+      margin-bottom: 10px;
+      justify-content: center;
+      padding: 15px;
+      position: relative;
+      flex-wrap: wrap;
+      color: var(--text-light, #333);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid rgba(0,0,0,0.05);
+      transition: transform 0.2s;
+    }
+    
+    [data-theme="dark"] .inline-match-item {
+        background: var(--card-dark, #1e1e1e);
+        color: var(--text-dark, #e0e0e0);
+        border-color: #333;
+    }
 
-.inline-match-item .first-team,
-.inline-match-item .second-team {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  font-size: 12px;
-  font-weight: bold;
-}
+    .inline-match-item:hover { transform: translateY(-2px); }
 
-.inline-match-item .img {
-  width: 26px;
-  height: 26px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+    .inline-match-item .first-team,
+    .inline-match-item .second-team {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: bold;
+    }
 
-.inline-match-item .img img {
-  max-width: 100%;
-  max-height: 100%;
-}
+    .inline-match-item .img { width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; }
+    .inline-match-item .img img { max-width: 100%; max-height: 100%; }
 
-.inline-match-item .result-wrap {
-  width: 62px;
-  height: 20px;
-  border-radius: 50px;
-  background: var(--result-bg, #191D2D);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: bold;
-  color: var(--text, #BFC3D4);
-  margin: 0 15px;
-  padding-top: 4px;
-  position: relative;
-}
+    /* === منطقة النتيجة === */
+    .inline-match-item .result-wrap {
+      min-width: 80px;
+      height: 30px;
+      border-radius: 20px;
+      background: #eee;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 900;
+      color: #333;
+      margin: 0 15px;
+    }
+    [data-theme="dark"] .inline-match-item .result-wrap { background: #333; color: #fff; }
 
-.inline-match-item .result-wrap b {
-  margin-bottom: 2px;
-}
+    /* المباريات المباشرة */
+    .inline-match-item.match-live .result-wrap {
+      background: var(--primary, #d32f2f);
+      color: white;
+      animation: pulse 2s infinite;
+    }
 
-.inline-match-item.match-live .result-wrap {
-  background: conic-gradient(#FF3131 calc(var(--percent, 0%) * 1%), #555 0);
-  color: white;
-}
+    .inline-match-item .live {
+      position: absolute;
+      font-size: 10px;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--success, #4caf50);
+      color: white;
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-weight: bold;
+    }
 
-.inline-match-item.match-upcoming .result-wrap {
-  background: var(--result-bg, #191D2D);
-}
+    .match-section-title {
+      font-weight: 900;
+      margin: 20px 0 10px;
+      color: var(--primary, #d32f2f);
+      font-size: 16px;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 5px;
+    }
+    [data-theme="dark"] .match-section-title { border-color: #333; }
 
-.inline-match-item.match-ended .result-wrap {
-  background: var(--result-bg, #191D2D);
-}
-
-.inline-match-item .live {
-  position: absolute;
-  font-size: 10px;
-  top: -14px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #FF3131;
-  color: white;
-  border-radius: 50px;
-  padding: 2px 6px;
-  font-weight: bold;
-}
-
-.match-section-title {
-  font-weight: bold;
-  margin: 10px 0 5px;
-  color: var(--text, #BFC3D4);
-  font-size: 16px;
-}
-/* === المباريات المنتهية === */
-.result-status-text {
-  position: absolute;
-  right: 50%;
-  transform: translateX(50%);
-  top: -20px;
-  font-size: 10px;
-  font-weight: normal;
-  color: #BFC3D4;
-  white-space: nowrap;
-}
-
-.inline-match-item.match-with-result .result-wrap {
-  font-size: 14px;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-}
-
-.inline-match-item .result-wrap {
-  width: 62px;
-  height: 20px;
-  border-radius: 50px;
-  background: #191D2D;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: bold;
-  color: #BFC3D4 !important;
-  margin: 0 15px;
-  padding-top: 4px;
-  position: relative;
-}
-
-.inline-match-item .result-wrap b {
-  font-weight: bold;
-  display: flex;
-  margin-bottom: 2px;
-}
-
-/* === المباريات الجارية (دائرة احترافية) === */
-.active-match-progress {
-  margin: 0 20px;
-  position: relative;
-}
-
-.match-inner-progress-wrap {
-  position: relative;
-  width: 50px;
-  height: 50px;
-}
-
-.match-inner-progress-wrap .percent {
-  width: 50px;
-  height: 50px;
-}
-
-.match-inner-progress-wrap svg {
-  transform: rotate(270deg);
-  position: relative;
-  width: 50px;
-  height: 50px;
-  border-radius: 100%;
-  background: #191D2D;
-}
-
-.match-inner-progress-wrap svg circle {
-  stroke-linecap: butt;
-  stroke-dasharray: var(--circumference);
-  stroke-dashoffset: calc(var(--circumference) - (var(--percent, 0) / 100) * var(--circumference));
-  width: 100%;
-  height: 100%;
-  fill: none;
-  stroke-width: 5;
-  stroke: #333;
-  r: 20;
-  cx: 25;
-  cy: 25;
-}
-
-.match-inner-progress-wrap svg circle:last-child {
-  stroke: #39DBBF;
-  stroke-dasharray: 157;
-  stroke-dashoffset: calc(157 - (var(--num, 0) / 100) * 157);
-  transition: stroke-dashoffset 0.5s ease;
-}
-
-.match-inner-progress-wrap .number {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #39DBBF;
-  font-size: 12px;
-  font-weight: bold;
-  direction: ltr;
-}
-
-.result-status-text.live-match-status {
-  top: auto;
-  bottom: -18px;
-  font-weight: bold;
-}
-
-.extra-time i {
-  font-style: normal;
-  margin-right: 4px;
-  color: #BFC3D4;
-}
-
-.inline-match-item.active-match .match-team-item.second-team {
-  justify-content: flex-start;
-}
-.inline-match-item.match-live .team---item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-.inline-match-item.match-live .match-team-item {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-
-
-/* === Cup Title === */
-.cup-title {
-  width: 100%;
-  font-size: 13px;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 6px;
-  color: var(--text, #BFC3D4);
-}
-
-/* === Utility === */
-.goal-number {
-  font-size: 14px;
-  font-weight: bold;
-  min-width: 20px;
-  text-align: center;
-  color: var(--text, #BFC3D4);
-}
-
-.match-result-center {
-  text-align: center;
-}
-
-.ended-label {
-  font-size: 11px;
-  color: var(--text, #BFC3D4);
-  margin-bottom: 2px;
-}
-
-.result-score {
-  font-size: 16px;
-  font-weight: bold;
-  color: var(--text, #BFC3D4);
-}
-.first-team-result.winner,
-.second-team-result.winner {
-color: #39DBBF;
-}
-.first-team-result.loser,
-.second-team-result.loser {
-color: #FF3131;
-}
-/* === Responsiveness === */
-@media (max-width: 500px) {
-.inline-match-item {
-flex-direction: row !important; /* نمنع العمودي */
-flex-wrap: nowrap;
-padding: 12px;
-}
-
-.inline-match-item .first-team,
-.inline-match-item .second-team {
-font-size: 10px;
-gap: 6px;
-}
-
-.inline-match-item .img {
-width: 20px;
-height: 20px;
-}
-
-.inline-match-item .live {
-font-size: 9px;
-padding: 2px 4px;
-top: -12px;
-}
-
-.match-section-title {
-font-size: 14px;
-}
-}
-.match-inner-progress-wrap svg {
-  background: var(--progress-bg);
-}
-.match-inner-progress-wrap svg circle {
-  stroke: var(--progress-track);
-}
-.match-inner-progress-wrap svg circle:last-child {
-  stroke: var(--progress-color);
-}
-.match-inner-progress-wrap .number {
-  color: var(--progress-color);
-}
-.inline-match-item.match-live.active-match {
-  justify-content: center;
-  gap: 6px;
-}
-
-.inline-match-item.match-live .match-team-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 70px;
-  padding: 0 6px;
-  gap: 4px;
-  }
-.inline-match-item.match-live .team---item b {
-  font-size: 11px;
-  text-align: center;
-  line-height: 1.2;
-}
-
-.inline-match-item.match-live .team-result {
-  font-size: 13px;
-  font-weight: bold;
-  margin-top: 4px;
-  margin-bottom: -2px;
-}
-
-.active-match-progress {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin: 0 10px; /* تعطي مساحة بين الدائرة والنتيجة */
-}
-.status-text-top,
-.status-text-bottom {
-  font-size: 10px;
-  font-weight: bold;
-  text-align: center;
-  color: var(--text, #BFC3D4);
-  margin: 2px 0;
-}
-
+    /* === Responsive === */
+    @media (max-width: 500px) {
+        .inline-match-item { padding: 10px; }
+        .inline-match-item .first-team, .inline-match-item .second-team { font-size: 12px; gap: 5px; }
+        .inline-match-item .img { width: 25px; height: 25px; }
+    }
   `;
   document.head.appendChild(style);
   
